@@ -1,0 +1,21 @@
+{
+  "name": "Radio",
+  "version": "0.0.0",
+  "authors": [
+    "bladechapman <bechapm2@illinois.edu>"
+  ],
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "socket.io-client": "~1.3.5"
+  }
+}
