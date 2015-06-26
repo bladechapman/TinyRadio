@@ -2,7 +2,6 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 (function() {
     var context = new AudioContext();
-    var baseURL = 'http://localhost:8000';
     var socket = io();
     var source;
     var serverSync; // server timestamp
@@ -49,11 +48,11 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
         }
 
         var infoReq = new XMLHttpRequest();
-        infoReq.open('GET', baseURL + '/info', true);
+        infoReq.open('GET', '/info', true);
         infoReq.responseType = 'json';
 
         var songReq = new XMLHttpRequest();
-        songReq.open('GET', baseURL + '/song', true);
+        songReq.open('GET', '/song', true);
         songReq.responseType = 'arraybuffer';
 
         infoReq.send();
