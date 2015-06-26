@@ -4,13 +4,16 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
     var context = new AudioContext();
     var socket = io();
     var source;
-    var serverSync; // server timestamp
+    var serverOffset; // server timestamp
 
-    socket.on('connection', function() {
-
+    ntp.init(socket, {
+        interval : 333,
+        buffer: 5
+    });
+    socket.on('app:connection', function() {
         loadSound();
     })
-    socket.on('next_song', function() {
+    socket.on('app:next_song', function() {
         loadSound();
     })
 
@@ -32,7 +35,8 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
             source.buffer = decoded;
             source.connect(context.destination);    // connect to whatever is rendering the audio (speakers)
 
-            var requestTime = Date.now() - info.servTimestamp;
+            // positive ntp indicates client is ahead of server
+            var requestTime = (Date.now() - ntp.offset()) - info.servTimestamp;
             var songTime = info.servTimestamp - info.songTimestamp;
 
             var elapsedTime = (requestTime + songTime) / 1000;

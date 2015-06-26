@@ -42,6 +42,7 @@ function DJ(path) {
 
             findDuration(curDJ.path + file, function(duration) {
 
+                // duration needs to be adjusted to playback speed of Audio API player
                 clearTimeout(timout);
                 timout = setTimeout(function() {
                     curDJ.startNextTrack(function() {});
@@ -67,7 +68,6 @@ DJ.prototype.addEventListener = function(eventName, callback) {
     console.log('total number of event handlers: ' + this.events[eventName].length);
 }
 DJ.prototype.removeEventListener = function(eventName, callback) {
-    console.log('CALLED');
 
     if (!callback || this.events[eventName].indexOf(callback) == -1) {
         console.log('callback not found for removal');

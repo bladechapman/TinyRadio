@@ -8,7 +8,8 @@ var dj = new dj_generator('sound/');
 
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http)
+var io = require('socket.io')(http);
+var ntp = require('./ntp-server');
 
 
 app.use(express.static(__dirname + '/public'));
@@ -21,16 +22,16 @@ app.use(bodyParser.urlencoded({
     dj.startNextTrack(function() {});
 
     dj.addEventListener('next_song', function() {
-        io.emit('next_song');
+        io.emit('app:next_song');
     })
 })();
 
 (function initEndpoints() {
     io.on('connection', function(socket) {
-        socket.emit('connection')
-
-        socket.on('disconnect', function() {
-        })
+        ntp.sync(socket);
+        setTimeout(function() {
+            socket.emit('app:connection');
+        }, 3000);
     })
 
     app.get('/info', function(req, res) {
