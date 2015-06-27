@@ -7,7 +7,7 @@ $(function() {
     var serverOffset; // server timestamp
 
     $('#mobile_start').on('click', function() {
-        if (source) { source.start();}
+        loadSound();
     })
 
     ntp.init(socket, {
@@ -51,7 +51,7 @@ $(function() {
 
     function loadSound() {
         if (source) {
-            source.stop();
+            source.stop(0);
         }
 
         var infoReq = new XMLHttpRequest();
