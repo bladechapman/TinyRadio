@@ -1,21 +1,18 @@
 function Node(name) {
     var find = '$-$';
     var re = new RegExp(find, 'g');
+
     name = name.replace(re, '_');
 
     this.name = name;
     this.edges = {};
 }
-
 function Edge(node1, node2) {
     this.names = [node1.name + '$-$' + node2.name, node2.name + '$-$' + node1.name];
 
-    var name1 = node1.name;
-    var name2 = node2.name;
-    this.nodes = {
-        name1 : node1,
-        name2 : node2
-    }
+    this.nodes = {};
+    this.nodes[node1.name] = node1;
+    this.nodes[node2.name] = node2;
 
     var labelName = this.names[0];
     node1.edges[labelName] = this;
@@ -27,15 +24,13 @@ function Selector(data) {
     var nodes = {};
     var edges = {};
 
-    (function construct() {
-        // build initial network of songs
-        if (data) {
-            for (var i = 0; i < data.length; i++) {
-                this.addNode(data[i]);
-            }
-        }
-    })
-
+    this.select = function() {
+        var files = Object.keys(nodes);
+        return files[parseInt(Math.random() * files.length)];
+    }
+    this.rateSelection = function(rating) {
+        console.log('Okay! *continues to ignore you*');
+    }
     this.findNode = function(name) {
         return nodes[name];
     }
@@ -45,7 +40,6 @@ function Selector(data) {
         if (edges[secondaryName]) { return edges[secondaryName];}
         return null;
     }
-
     this.addNode = function(name) {
         var newNode = new Node(name);
         for (var i in nodes) {
@@ -53,6 +47,13 @@ function Selector(data) {
             edges[newEdge.names[0]] = newEdge;
         }
         nodes[newNode.name] = newNode;
+    }
+
+    // build initial network of songs
+    if (data) {
+        for (var i = 0; i < data.length; i++) {
+            this.addNode(data[i]);
+        }
     }
 }
 

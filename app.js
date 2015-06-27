@@ -2,9 +2,9 @@ var express = require('express');
 var path = require('path');
 var fs = require('fs');
 var bodyParser = require('body-parser');
-var dj_generator = require('./dj');
+var DJ = require('./dj');
 
-var dj = new dj_generator('sound/');
+var dj = new DJ('sound/');
 
 var app = express();
 var http = require('http').Server(app);
@@ -30,8 +30,19 @@ app.use(bodyParser.urlencoded({
     io.on('connection', function(socket) {
         ntp.sync(socket);
         setTimeout(function() {
-            socket.emit('app:connection');
+            socket.emit('app:next_song');
         }, 3000);
+    })
+
+    app.post('/vote', function(req, res) {
+        if (req.body.vote === undefined || (req.body.vote != 1 && req.body.vote != 0)) {
+            res.json({
+                'message' : '[ERROR] invalid vote value',
+            })
+        }
+
+        dj.rateConnection(rate.body.vote);
+        res.json({'message' : '[SUCCESS]'})
     })
 
     app.get('/info', function(req, res) {

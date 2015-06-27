@@ -31,12 +31,15 @@ function DJ(path) {
         })
     }
 
+    this.rateConnection = function(rating) {    // 1 : positive, 0 : negative
+        this.selector.rateSelection(rating);
+    }
     this.startNextTrack = function(callback) {
         var curDJ = this;
         fs.readdir(curDJ.path, function(err, files) {
             // for now, just return random
             // eventually convert this into an LRU cache
-            var file = files[parseInt(Math.random() * files.length)];
+            var file = curDJ.selector.select();
             // var file = curDJ.selector.selectNext();
             file = file.replace(/\s/g, '\\ ');
 
@@ -55,7 +58,6 @@ function DJ(path) {
                 callback(curDJ.curSong);
             })
         })
-
     }
 }
 DJ.prototype.registerEvent = function(eventName) {

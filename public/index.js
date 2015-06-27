@@ -1,18 +1,21 @@
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-(function() {
+$(function() {
     var context = new AudioContext();
     var socket = io();
     var source;
     var serverOffset; // server timestamp
 
+    $('#mobile_start').on('click', function() {
+        if (source) { source.start();}
+    })
+
     ntp.init(socket, {
         interval : 333,
+        decay : 500,
+        decayLimit : 60000,
         buffer: 5
     });
-    socket.on('app:connection', function() {
-        loadSound();
-    })
     socket.on('app:next_song', function() {
         loadSound();
     })
@@ -80,4 +83,5 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
             }
         }
     }
-})();
+
+})
