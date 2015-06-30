@@ -1,11 +1,6 @@
 function Node(name) {
-    var find = '$-$';
-    var re = new RegExp(find, 'g');
-
-    name = name.replace(re, '_');
-
     this.name = name;
-    this.neighbors = {};
+    this.neighbors = {};    // favor weights of neighboring sounds
 }
 
 // takes a list of song names to generate graph
@@ -19,7 +14,7 @@ function Selector(data) {
     this.findNode = function(name) {
         return nodes[name];
     }
-    this.addNode = function(name) {
+    this.addNode = function(name) {     // maintains complete, bi-directional graph
         var newNode = new Node(name);
         for (var i in nodes) {
             newNode.neighbors[nodes[i].name] = 0;
@@ -28,12 +23,14 @@ function Selector(data) {
         nodes[newNode.name] = newNode;
     }
     this.selectFrom = function(origin) {
-        var files = Object.keys(nodes);
-        return files[parseInt(Math.random() * files.length)];
+        if (origin === '' || origin === undefined) {
+            return nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
+        }
 
-        // var originNode = this.findNode(origin);
-        // var files = originNode.edges;
-
+        var originNode = this.findNode(origin);
+        var files = originNode.neighbors;
+        var ret = Object.keys(files)[parseInt(Math.random() * Object.keys(files).length)];
+        return ret;
     }
 
     // build initial network of songs

@@ -42,7 +42,7 @@ app.use(bodyParser.urlencoded({
             return;
         }
 
-        dj.rateConnection(req.body.vote);
+        dj.rateSelection(req.body.vote);
         res.json({'message' : '[SUCCESS]'})
     })
 

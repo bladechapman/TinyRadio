@@ -8,7 +8,7 @@ function DJ(path) {
     var songBuffer = 3000;
     this.path = path;
     this.startTimestamp = 0;
-    this.curSong = '';
+    this.curSong;
     this.events = {}    // name, callbacks
     this.selector = new SelectionEngine(fs.readdirSync(this.path));
 
@@ -31,7 +31,7 @@ function DJ(path) {
         })
     }
 
-    this.rateConnection = function(rating) {    // 1 : positive, 0 : negative
+    this.rateSelection = function(rating) {    // 1 : positive, 0 : negative
         this.selector.rateSelection(rating);
     }
     this.startNextTrack = function(callback) {
@@ -40,6 +40,7 @@ function DJ(path) {
             // for now, just return random
             // eventually convert this into an LRU cache
             var file = curDJ.selector.selectFrom(curDJ.curSong);
+            console.log('selected file: ' + file);
 
             findDuration(curDJ.path + filepathConvert.convertTo(file), function(duration) {
 
@@ -51,6 +52,7 @@ function DJ(path) {
 
                 curDJ.startTimestamp = Date.now();
                 curDJ.curSong = file;
+                console.log(curDJ.curSong);
                 curDJ.dispatchEvent('next_song');
 
                 callback(curDJ.curSong);

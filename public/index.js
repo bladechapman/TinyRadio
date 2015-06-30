@@ -44,7 +44,7 @@ $(function() {
 
             var elapsedTime = (requestTime + songTime) / 1000;
 
-            console.log('requestTime in milliseconds: ' + requestTime);
+            console.log('ntp offset: ' + ntp.offset());
             source.start(context.currentTime, elapsedTime);
         })
     }
