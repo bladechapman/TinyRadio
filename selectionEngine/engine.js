@@ -30,6 +30,7 @@ function Selector(data) {
     }
     this.rateSelection = function(rating) {
         console.log('Okay! *continues to ignore you*');
+
     }
     this.findNode = function(name) {
         return nodes[name];

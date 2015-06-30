@@ -1,6 +1,7 @@
 var fs = require('fs');
 var childProcess = require('child_process');
 var SelectionEngine = require('./selectionEngine/engine');
+var filepathConvert = require('./filepath-convert');
 
 function DJ(path) {
     var timout;
@@ -19,7 +20,6 @@ function DJ(path) {
 
     function findDuration(path, callback) {
         childProcess.exec('ffmpeg -i ' + path, function(error, stdout, stderr) {
-
             var durString = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
             var durStringArr = durString.split('.')[0].split(':');
             durStringArr.push(durString.split('.')[1].substring(0, 2));
@@ -40,10 +40,8 @@ function DJ(path) {
             // for now, just return random
             // eventually convert this into an LRU cache
             var file = curDJ.selector.select();
-            // var file = curDJ.selector.selectNext();
-            file = file.replace(/\s/g, '\\ ');
 
-            findDuration(curDJ.path + file, function(duration) {
+            findDuration(curDJ.path + filepathConvert.convertTo(file), function(duration) {
 
                 // duration needs to be adjusted to playback speed of Audio API player
                 clearTimeout(timout);
@@ -66,17 +64,17 @@ DJ.prototype.registerEvent = function(eventName) {
 DJ.prototype.addEventListener = function(eventName, callback) {
     if (!this.events[eventName]) { return;}
     this.events[eventName].push(callback);
-    console.log('listener added at index: ' + this.events[eventName].indexOf(callback));
-    console.log('total number of event handlers: ' + this.events[eventName].length);
+    // console.log('listener added at index: ' + this.events[eventName].indexOf(callback));
+    // console.log('total number of event handlers: ' + this.events[eventName].length);
 }
 DJ.prototype.removeEventListener = function(eventName, callback) {
 
     if (!callback || this.events[eventName].indexOf(callback) == -1) {
-        console.log('callback not found for removal');
+        // console.log('callback not found for removal');
         return;
     }
 
-    console.log('removing callback at index: ' + this.events[eventName].indexOf(callback));
+    // console.log('removing callback at index: ' + this.events[eventName].indexOf(callback));
 
     if (this.events[eventName].length >= 2) {
         console.log(this.events[eventName][0] == this.events[eventName][1]);
