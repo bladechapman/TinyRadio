@@ -52,7 +52,6 @@ function DJ(path) {
 
                 curDJ.startTimestamp = Date.now();
                 curDJ.curSong = file;
-                console.log(curDJ.curSong);
                 curDJ.dispatchEvent('next_song');
 
                 callback(curDJ.curSong);

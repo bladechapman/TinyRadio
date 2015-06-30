@@ -6,10 +6,16 @@ function Node(name) {
 // takes a list of song names to generate graph
 function Selector(data) {
     var nodes = {};
+    var lastSelected = undefined;
+    var currentSelected = undefined;
 
     this.rateSelection = function(rating) {
-        console.log('Okay! *continues to ignore you*');
-
+        // console.log('Okay! *continues to ignore you*');
+        if (lastSelected && currentSelected) {
+            var prev = nodes[lastSelected];
+            (rating == 1) ? (prev.neighbors[currentSelected] += 1) : (prev.neighbors[currentSelected] -= 1);
+            console.log(nodes);
+        }
     }
     this.findNode = function(name) {
         return nodes[name];
@@ -23,14 +29,20 @@ function Selector(data) {
         nodes[newNode.name] = newNode;
     }
     this.selectFrom = function(origin) {
+        var file;
         if (origin === '' || origin === undefined) {
-            return nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
+            file = nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
+        }
+        else {
+            var originNode = this.findNode(origin);
+            var files = originNode.neighbors;
+            file = Object.keys(files)[parseInt(Math.random() * Object.keys(files).length)];     // TODO: implement better picking
         }
 
-        var originNode = this.findNode(origin);
-        var files = originNode.neighbors;
-        var ret = Object.keys(files)[parseInt(Math.random() * Object.keys(files).length)];
-        return ret;
+        lastSelected = currentSelected;
+        currentSelected = file;
+
+        return file;
     }
 
     // build initial network of songs
