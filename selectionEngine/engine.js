@@ -5,29 +5,13 @@ function Node(name) {
     name = name.replace(re, '_');
 
     this.name = name;
-    this.edges = {};
-}
-function Edge(node1, node2) {
-    this.names = [node1.name + '$-$' + node2.name, node2.name + '$-$' + node1.name];
-
-    this.nodes = {};
-    this.nodes[node1.name] = node1;
-    this.nodes[node2.name] = node2;
-
-    var labelName = this.names[0];
-    node1.edges[labelName] = this;
-    node2.edges[labelName] = this;
+    this.neighbors = {};
 }
 
 // takes a list of song names to generate graph
 function Selector(data) {
     var nodes = {};
-    var edges = {};
 
-    this.select = function() {
-        var files = Object.keys(nodes);
-        return files[parseInt(Math.random() * files.length)];
-    }
     this.rateSelection = function(rating) {
         console.log('Okay! *continues to ignore you*');
 
@@ -35,19 +19,21 @@ function Selector(data) {
     this.findNode = function(name) {
         return nodes[name];
     }
-    this.findEdge = function(name) {
-        var secondaryName = name.split('$-$')[1] + '$-$' + name.split('$-$')[0];
-        if (edges[name]) { return edges[name];}
-        if (edges[secondaryName]) { return edges[secondaryName];}
-        return null;
-    }
     this.addNode = function(name) {
         var newNode = new Node(name);
         for (var i in nodes) {
-            var newEdge = new Edge(newNode, nodes[i]);
-            edges[newEdge.names[0]] = newEdge;
+            newNode.neighbors[nodes[i].name] = 0;
+            nodes[i].neighbors[newNode.name] = 0;
         }
         nodes[newNode.name] = newNode;
+    }
+    this.selectFrom = function(origin) {
+        var files = Object.keys(nodes);
+        return files[parseInt(Math.random() * files.length)];
+
+        // var originNode = this.findNode(origin);
+        // var files = originNode.edges;
+
     }
 
     // build initial network of songs
@@ -56,6 +42,8 @@ function Selector(data) {
             this.addNode(data[i]);
         }
     }
+
+    console.log(nodes);
 }
 
 module.exports = Selector;

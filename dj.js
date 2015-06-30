@@ -39,7 +39,7 @@ function DJ(path) {
         fs.readdir(curDJ.path, function(err, files) {
             // for now, just return random
             // eventually convert this into an LRU cache
-            var file = curDJ.selector.select();
+            var file = curDJ.selector.selectFrom(curDJ.curSong);
 
             findDuration(curDJ.path + filepathConvert.convertTo(file), function(duration) {
 
