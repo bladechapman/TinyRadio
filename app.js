@@ -39,9 +39,10 @@ app.use(bodyParser.urlencoded({
             res.json({
                 'message' : '[ERROR] invalid vote value',
             })
+            return;
         }
 
-        dj.rateConnection(rate.body.vote);
+        dj.rateConnection(req.body.vote);
         res.json({'message' : '[SUCCESS]'})
     })
 
