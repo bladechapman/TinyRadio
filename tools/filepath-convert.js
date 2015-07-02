@@ -1,8 +1,13 @@
 module.exports = {
     convertTo : function(path) {
-        return path.replace(/\s/g, '\\ ');
+        path = path.replace(/\s/g, '\\ ');
+        path = path.replace(/\(/g, '\\(');
+        path = path.replace(/\)/g, '\\)');
+        return path
     },
     convertFrom : function(path) {
-        return path.replace(/\\\s/g, ' ');
+        path = path.replace(/\\\s/g, ' ');
+        path = path.replace(/\(/g, '(');
+        path = path.replace(/\)/g, ')');
     }
 }

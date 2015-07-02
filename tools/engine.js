@@ -31,7 +31,7 @@ function Selector(data) {
     }
     this.selectFrom = function(origin) {
         var file;
-        if (origin === '' || origin === undefined) {
+        if (origin === '' || origin === undefined) {    // initially just pick a random node
             file = nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
         }
         else {

@@ -20,6 +20,7 @@ function DJ(path) {
 
     function findDuration(path, callback) {
         childProcess.exec('ffmpeg -i ' + path, function(error, stdout, stderr) {
+            console.log(path);
             var durString = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
             var durStringArr = durString.split('.')[0].split(':');
             durStringArr.push(durString.split('.')[1].substring(0, 2));
@@ -43,7 +44,6 @@ function DJ(path) {
             console.log('selected file: ' + file);
 
             findDuration(curDJ.path + filepathConvert.convertTo(file), function(duration) {
-
                 // duration needs to be adjusted to playback speed of Audio API player
                 clearTimeout(timout);
                 timout = setTimeout(function() {
