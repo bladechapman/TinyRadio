@@ -1,6 +1,6 @@
 var fs = require('fs');
 var childProcess = require('child_process');
-var SelectionEngine = require('./selectionEngine/engine');
+var SelectionEngine = require('./engine');
 var filepathConvert = require('./filepath-convert');
 
 function DJ(path) {

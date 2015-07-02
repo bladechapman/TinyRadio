@@ -10,11 +10,12 @@ function Selector(data) {
     var currentSelected = undefined;
 
     this.rateSelection = function(rating) {
-        // console.log('Okay! *continues to ignore you*');
         if (lastSelected && currentSelected) {
             var prev = nodes[lastSelected];
             (rating == 1) ? (prev.neighbors[currentSelected] += 1) : (prev.neighbors[currentSelected] -= 1);
             console.log(nodes);
+        } else {
+            console.log('Okay! *continues to ignore you*');
         }
     }
     this.findNode = function(name) {

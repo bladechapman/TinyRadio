@@ -2,14 +2,14 @@ var express = require('express');
 var path = require('path');
 var fs = require('fs');
 var bodyParser = require('body-parser');
-var DJ = require('./dj');
+var DJ = require('./tools/dj');
 
 var dj = new DJ('sound/');
 
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var ntp = require('./ntp-server');
+var ntp = require('./tools/ntp-server');
 
 
 app.use(express.static(__dirname + '/public'));
