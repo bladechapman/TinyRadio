@@ -27,7 +27,7 @@ function Selector(data, meta_path) {
         }
 
         var rand = parseInt(Math.random() * accumulation) + 1;
-        for (var i = 0; i < list.length; i++) {
+        for (var i = 1; i <= list.length; i++) {
             if (rand <= list[i].accumulation) { return list[i].node}
         }
     }
