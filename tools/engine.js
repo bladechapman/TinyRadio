@@ -1,14 +1,19 @@
+var fs = require('fs');
+
 function Node(name) {
     this.name = name;
     this.neighbors = {};    // favor weights of neighboring sounds
 }
 
 // takes a list of song names to generate graph
-function Selector(data) {
+function Selector(data, meta_path) {
+    var curSelector = this;
     var nodes = {};
     var lastSelected = undefined;
     var currentSelected = undefined;
     var initial_ranking = 5;
+    var meta_data = undefined;
+        meta_path = meta_path || './';
 
     function sampleWeighted(weights) {
         list = [];
@@ -26,6 +31,13 @@ function Selector(data) {
             if (rand <= list[i].accumulation) { return list[i].node}
         }
     }
+    function initializeGraph() {
+        if (data) {
+            for (var i = 0; i < data.length; i++) {
+                curSelector.addNode(data[i]);
+            }
+        }
+    }
 
     this.rateSelection = function(rating) {
         if (lastSelected && currentSelected) {
@@ -39,16 +51,24 @@ function Selector(data) {
     this.findNode = function(name) {
         return nodes[name];
     }
-    this.addNode = function(name) {     // maintains complete, bi-directional graph
-        var newNode = new Node(name);
-        for (var i in nodes) {
-            newNode.neighbors[nodes[i].name] = initial_ranking;
-            nodes[i].neighbors[newNode.name] = initial_ranking;
+    this.addNode = function(new_name) {     // maintains complete, bi-directional graph
+        var newNode = new Node(new_name);
+        for (var node_name in nodes) {
+            if (meta_data && meta_data[new_name] && meta_data[new_name].neighbors && meta_data[new_name].neighbors[node_name]) {
+                newNode.neighbors[node_name] = meta_data[new_name].neighbors[node_name];
+            } else {
+                newNode.neighbors[node_name] = initial_ranking;
+            }
+
+            if (meta_data && meta_data[node_name] && meta_data[node_name].neighbors && meta_data[node_name].neighbors[new_name]) {
+                nodes[node_name].neighbors[newNode.name] = meta_data[node_name].neighbors[new_name];
+            } else {
+                nodes[node_name].neighbors[newNode.name] = initial_ranking;
+            }
         }
         nodes[newNode.name] = newNode;
     }
     this.selectFrom = function(origin) {
-
         var file;
         if (origin === '' || origin === undefined) {    // initially just pick a random node
             file = nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
@@ -66,15 +86,23 @@ function Selector(data) {
 
         return file;
     }
-
-    // build initial network of songs
-    if (data) {
-        for (var i = 0; i < data.length; i++) {
-            this.addNode(data[i]);
-        }
+    this.saveMetadata = function() {
+        fs.writeFileSync(meta_path + 'sound_meta.json', JSON.stringify(nodes));
     }
 
-    // console.log(nodes);
+    try {
+        meta_data = JSON.parse(fs.readFileSync(meta_path + 'sound_meta.json', {encoding: 'utf8'}));
+        initializeGraph();
+    }
+    catch (err) {
+        console.log('Valid sound metadata not found, generating new...');
+        nodes = {};
+        initializeGraph();
+        curSelector.saveMetadata();
+        console.log('[SUCCESS] ' + meta_path + 'sound_meta.json');
+    }
+
+    console.log(nodes);
 }
 
 module.exports = Selector;

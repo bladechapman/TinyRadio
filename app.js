@@ -42,7 +42,7 @@ app.use(bodyParser.urlencoded({
             return;
         }
 
-        dj.rateSelection(req.body.vote);
+        dj.selector.rateSelection(req.body.vote);
         res.json({'message' : '[SUCCESS]'})
     })
 
@@ -59,6 +59,14 @@ app.use(bodyParser.urlencoded({
         readStream.pipe(res);
     })
 })();
+
+function gracefulExit() {
+    console.log('exiting gracefully');
+    dj.selector.saveMetadata();
+    process.exit();
+}
+process.on('SIGTERM', gracefulExit);
+process.on('SIGINT', gracefulExit);
 
 http.listen(8000, function() {
     console.log('listening on port 8000');
