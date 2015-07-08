@@ -8,12 +8,30 @@ function Selector(data) {
     var nodes = {};
     var lastSelected = undefined;
     var currentSelected = undefined;
+    var initial_ranking = 5;
+
+    function sampleWeighted(weights) {
+        list = [];
+        accumulation = 0;
+        for (var node in weights) {
+            accumulation += weights[node]
+            list.push({
+                'node' : node,
+                'accumulation' : accumulation
+            })
+        }
+
+        var rand = parseInt(Math.random() * accumulation) + 1;
+        for (var i = 0; i < list.length; i++) {
+            if (rand <= list[i].accumulation) { return list[i].node}
+        }
+    }
 
     this.rateSelection = function(rating) {
         if (lastSelected && currentSelected) {
             var prev = nodes[lastSelected];
-            (rating == 1) ? (prev.neighbors[currentSelected] += 1) : (prev.neighbors[currentSelected] -= 1);
-            console.log(nodes);
+            if (rating == 1 && prev.neighbors[currentSelected] < 50) { prev.neighbors[currentSelected] += 1;}
+            if (rating == 0 && prev.neighbors[currentSelected] >= 2)  { prev.neighbors[currentSelected] -= 1;}
         } else {
             console.log('Okay! *continues to ignore you*');
         }
@@ -24,20 +42,23 @@ function Selector(data) {
     this.addNode = function(name) {     // maintains complete, bi-directional graph
         var newNode = new Node(name);
         for (var i in nodes) {
-            newNode.neighbors[nodes[i].name] = 0;
-            nodes[i].neighbors[newNode.name] = 0;
+            newNode.neighbors[nodes[i].name] = initial_ranking;
+            nodes[i].neighbors[newNode.name] = initial_ranking;
         }
         nodes[newNode.name] = newNode;
     }
     this.selectFrom = function(origin) {
+
         var file;
         if (origin === '' || origin === undefined) {    // initially just pick a random node
             file = nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
+            // console.log(sampleWeighted(nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].neighbors));
         }
         else {
             var originNode = this.findNode(origin);
-            var files = originNode.neighbors;
-            file = Object.keys(files)[parseInt(Math.random() * Object.keys(files).length)];     // TODO: implement better picking
+            // var files = originNode.neighbors;
+            // file = Object.keys(files)[parseInt(Math.random() * Object.keys(files).length)];     // TODO: implement better picking
+            var file = sampleWeighted(originNode.neighbors);
         }
 
         lastSelected = currentSelected;
@@ -53,7 +74,7 @@ function Selector(data) {
         }
     }
 
-    console.log(nodes);
+    // console.log(nodes);
 }
 
 module.exports = Selector;

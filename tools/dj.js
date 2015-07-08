@@ -10,7 +10,7 @@ function DJ(path) {
     this.startTimestamp = 0;
     this.curSong;
     this.events = {}    // name, callbacks
-    this.selector = new SelectionEngine(fs.readdirSync(this.path));
+    this.selector = new SelectionEngine(filterDirectory(this.path));
 
     this.registerEvent('next_song');
 
@@ -18,9 +18,19 @@ function DJ(path) {
     // weight the graph according to suggestions
     // traversal has entropy, which determines how much the dj can go 'upstream'
 
+    function filterDirectory(path) {
+        var ret = []
+        var files = fs.readdirSync(path);
+        files.forEach(function(element) {
+            var convertedPath = path + element;
+            if(fs.statSync(convertedPath).isFile()) {
+                ret.push(element);
+            }
+        });
+        return ret;
+    }
     function findDuration(path, callback) {
         childProcess.exec('ffmpeg -i ' + path, function(error, stdout, stderr) {
-            console.log(path);
             var durString = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
             var durStringArr = durString.split('.')[0].split(':');
             durStringArr.push(durString.split('.')[1].substring(0, 2));
@@ -41,21 +51,28 @@ function DJ(path) {
             // for now, just return random
             // eventually convert this into an LRU cache
             var file = curDJ.selector.selectFrom(curDJ.curSong);
-            console.log('selected file: ' + file);
 
-            findDuration(curDJ.path + filepathConvert.convertTo(file), function(duration) {
-                // duration needs to be adjusted to playback speed of Audio API player
-                clearTimeout(timout);
-                timout = setTimeout(function() {
-                    curDJ.startNextTrack(function() {});
-                }, duration + songBuffer);
+            try {
+                findDuration(curDJ.path + filepathConvert.convertTo(file), function(duration) {
+                    // duration needs to be adjusted to playback speed of Audio API player
+                    console.log('Selected file: ' + file);
 
-                curDJ.startTimestamp = Date.now();
-                curDJ.curSong = file;
-                curDJ.dispatchEvent('next_song');
+                    clearTimeout(timout);
+                    timout = setTimeout(function() {
+                        curDJ.startNextTrack(function() {});
+                    }, duration + songBuffer);
 
-                callback(curDJ.curSong);
-            })
+                    curDJ.startTimestamp = Date.now();
+                    curDJ.curSong = file;
+                    curDJ.dispatchEvent('next_song');
+
+                    callback(curDJ.curSong);
+                })
+            }
+            catch(err) {
+                console.log('[ERROR] Cannot read file ' + file + ', trying again');
+                curDJ.startNextTrack(function() {});
+            }
         })
     }
 }
