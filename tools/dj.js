@@ -47,6 +47,7 @@ function DJ(path) {
     // }
     this.startNextTrack = function(callback) {
         var curDJ = this;
+        callback = callback || function() {};
         fs.readdir(curDJ.path, function(err, files) {
             // for now, just return random
             // eventually convert this into an LRU cache

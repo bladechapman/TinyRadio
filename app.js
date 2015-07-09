@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 (function startDJ(){
-    dj.startNextTrack(function() {});
+    dj.startNextTrack();
 
     dj.addEventListener('next_song', function() {
         io.emit('app:next_song');
@@ -32,6 +32,10 @@ app.use(bodyParser.urlencoded({
         setTimeout(function() {
             socket.emit('app:next_song');
         }, 3000);
+    })
+
+    app.post('/skip', function(req, res) {
+        dj.startNextTrack()
     })
 
     app.post('/vote', function(req, res) {
