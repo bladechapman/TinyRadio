@@ -26,6 +26,9 @@ $(function() {
     socket.on('app:next_song', function() {
         loadSound();
 
+        $('#cover').fadeTo(100, 0, function() {
+            $('#cover').hide();
+        });
         $('.menu_wrapper').show();
         $('.menu_wrapper').fadeTo(50, 1);
 

@@ -8,6 +8,15 @@ body {
     overflow: hidden;
     position: relative;
 }
+#cover {
+    height: 100vh;
+    width: 100vw;
+    background-color: #546E7A;
+    color: white;
+    position: fixed;
+    z-index: 100;
+    text-align: center;
+}
 #chart {
     display: block;
     overflow-x: hidden;
@@ -16,6 +25,15 @@ body {
     z-index: 2;
 }
 
+#cover img{
+    display: block;
+    width: 200px;
+    height: 200px;
+    margin: 50px auto;
+}
+.cover_text {
+    margin: 0 auto;
+}
 .mobile_activate {
     height: 30px;
     line-height: 30px;
