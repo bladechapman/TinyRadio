@@ -67,6 +67,8 @@ $(function() {
 
             console.log('ntp offset: ' + ntp.offset());
 
+            temp_source.start(context.currentTime, elapsedTime);
+
             if (source) { source.stop(0);}
             source = temp_source;
             source.start(context.currentTime, elapsedTime);
