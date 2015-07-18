@@ -5,8 +5,9 @@ $(function() {
     var socket = io();
     var source;
     var serverOffset; // server timestamp
+    var serv_mutex = false;
 
-    setInterval(loadSound, 30000);
+    setInterval(loadSound, 120000);
 
     $('.mobile_activate').click(function() {
         oscillator = context.createOscillator();
@@ -18,10 +19,10 @@ $(function() {
     });
 
     ntp.init(socket, {
-        interval : 200,
+        interval : 333,
         decay : 0,
         decayLimit : 60000,
-        buffer: 20
+        buffer: 30
     });
     socket.on('app:next_song', function() {
         loadSound();
@@ -79,6 +80,11 @@ $(function() {
     }
 
     function loadSound() {
+        if (serv_mutex) { return; }
+        serv_mutex = true;
+
+        console.log('load sound attempt');
+
         var infoReq = new XMLHttpRequest();
         infoReq.open('GET', '/info', true);
         infoReq.responseType = 'json';
@@ -94,6 +100,7 @@ $(function() {
         var info;
         var asyncNetwork = async(2, function() {
             process(data, infoReq.response);
+            serv_mutex = false;
         })
 
         songReq.onload = function() {

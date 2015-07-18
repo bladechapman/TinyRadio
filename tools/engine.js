@@ -42,8 +42,8 @@ function Selector(data, meta_path) {
     this.rateSelection = function(rating) {
         if (lastSelected && currentSelected) {
             var prev = nodes[lastSelected];
-            if (rating == 1 && prev.neighbors[currentSelected] < 50) { prev.neighbors[currentSelected] += 3;}
-            if (rating == 0 && prev.neighbors[currentSelected] >= 2)  { prev.neighbors[currentSelected] -= 2;}
+            if (rating == 1 && prev.neighbors[currentSelected] < 15) { prev.neighbors[currentSelected] += 1;}
+            if (rating == 0 && prev.neighbors[currentSelected] >= 2)  { prev.neighbors[currentSelected] -= 1;}
         } else {
             console.log('Okay! *continues to ignore you*');
         }
@@ -58,18 +58,14 @@ function Selector(data, meta_path) {
         var newNode = new Node(new_name);
         for (var node_name in nodes) {
             if (meta_data && meta_data[new_name] && meta_data[new_name].neighbors && meta_data[new_name].neighbors[node_name]) {
-                console.log('USED METADATA');
                 newNode.neighbors[node_name] = meta_data[new_name].neighbors[node_name];
             } else {
-                console.log('USE INITIAL RANKING');
                 newNode.neighbors[node_name] = initial_ranking;
             }
 
             if (meta_data && meta_data[node_name] && meta_data[node_name].neighbors && meta_data[node_name].neighbors[new_name]) {
-                console.log('USED METADATA');
                 nodes[node_name].neighbors[newNode.name] = meta_data[node_name].neighbors[new_name];
             } else {
-                console.log('USED INITIAL RANKING');
                 nodes[node_name].neighbors[newNode.name] = initial_ranking;
             }
         }
@@ -98,7 +94,6 @@ function Selector(data, meta_path) {
     }
 
     try {
-        console.log('TRYING TO LOAD DATA');
         meta_data = JSON.parse(fs.readFileSync(meta_path + 'sound_meta.json', {encoding: 'utf8'}));
         initializeGraph();
     }
@@ -108,8 +103,6 @@ function Selector(data, meta_path) {
         initializeGraph();
         console.log('[SUCCESS] ' + meta_path + 'sound_meta.json');
     }
-
-    console.log(nodes);
 }
 
 module.exports = Selector;
