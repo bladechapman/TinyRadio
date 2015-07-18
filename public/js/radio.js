@@ -54,14 +54,10 @@ $(function() {
         $('.songname').html(filter_filename(info.file));
         $('.songname').fadeTo(50, 1);
 
-        if (source) {
-            source.stop(0);
-        }
-
-        source = context.createBufferSource()
+        var temp_source = context.createBufferSource()
         context.decodeAudioData(data, function(decoded) {
-            source.buffer = decoded;
-            source.connect(context.destination);    // connect to whatever is rendering the audio (speakers)
+            temp_source.buffer = decoded;
+            temp_source.connect(context.destination);    // connect to whatever is rendering the audio (speakers)
 
             // positive ntp indicates client is ahead of server
             var requestTime = (Date.now() - ntp.offset()) - info.servTimestamp;
@@ -70,6 +66,9 @@ $(function() {
             var elapsedTime = (requestTime + songTime) / 1000;
 
             console.log('ntp offset: ' + ntp.offset());
+
+            if (source) { source.stop(0);}
+            source = temp_source;
             source.start(context.currentTime, elapsedTime);
         })
     }
