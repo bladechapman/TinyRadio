@@ -6,6 +6,8 @@ $(function() {
     var nodes = [],
         links = [];
 
+    var cached_data = {};
+
     var palette = {
         "lightgray": "#819090",
         "gray": "#708284",
@@ -50,8 +52,7 @@ $(function() {
         updateData(function(err, data) {
             if (err) { console.log (err); return; }
             reset();
-            build_nodes(data);
-
+            flatten_data(data);
             update();
         });
     }
@@ -63,21 +64,41 @@ $(function() {
     function build_nodes(data) {
         for (var node_name in data) {
             var new_node = { name: node_name };
+            if (cached_data[node_name] && cached_data[node_name].node) {
+                new_node['x'] = cached_data[node_name].node.x;
+                new_node['y'] = cached_data[node_name].node.y;
+            }
             nodes.push(new_node);
             data[node_name].node = new_node;
         }
-        for (var i = 0; i < nodes.length; i++) {
-            var cur_node = nodes[i];
-            var cur_node_neighbors = data[cur_node.name].neighbors;
+        cached_data = data;
+    }
+    function build_links(data) {
+        for (var cur_name in data) {
+            var cur = data[cur_name];
+            var cur_neighbors = data[cur_name].neighbors;
 
-            for (var cur_node_neighbor_name in cur_node_neighbors) {
-                links.push({
-                    source: cur_node,
-                    target: data[cur_node_neighbor_name].node,
-                    weight: cur_node_neighbors[cur_node_neighbor_name]
-                });
+            for (var target_name in cur_neighbors) {
+                var target = data[target_name];
+                var target_neighbors = target.neighbors;
+
+                var cur_to_target_weight = cur_neighbors[target_name];
+                var target_to_cur_weight = target_neighbors[cur_name];
+
+                var new_link = {
+                    source: cur.node,
+                    target: target.node,
+                    weight: (cur_to_target_weight + target_to_cur_weight)/2
+                }
+
+                links.push(new_link);
             }
+
         }
+    }
+    function flatten_data(data) {
+        build_nodes(data);
+        build_links(data);
     }
     function update() {
         node.remove();
@@ -131,6 +152,27 @@ $(function() {
         }
     }
 
-    window.__vis__initializeGraph = initialize;
-    window.__vis__updateGraph = update;
+    window.__vis__updateGraph = function() {
+        updateData(function(err, data) {
+            if (err) { console.log(err); return ;}
+            // build_nodes(data);
+            // for (var i = 0; i < links.length; i++) {
+            //     var cur_link = links[i];
+            //     var source_node_name = cur_link.source.name;
+            //     var target_node_name = cur_link.target.name;
+
+            //     var new_weight = data[source_node_name].neighbors[target_node_name];
+            //     if (new_weight && new_weight != cur_link.weight) {
+            //         cur_link.weight = new_weight;
+            //     }
+
+            // }
+
+            force.stop();
+            reset();
+            flatten_data(data);
+            // build_links(data);
+            update();
+        });
+    };
 });
