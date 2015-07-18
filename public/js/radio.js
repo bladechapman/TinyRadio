@@ -71,7 +71,7 @@ $(function() {
 
             if (source) { source.stop(0);}
             source = temp_source;
-            source.start(context.currentTime, elapsedTime);
+            // source.start(context.currentTime, elapsedTime);
         })
     }
 
