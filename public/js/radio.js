@@ -16,6 +16,8 @@ $(function() {
 
         $('.menu_wrapper').show();
         $('.menu_wrapper').fadeTo(50, 1);
+
+        $('.songname').fadeTo(50, 0);
     })
 
     function async(limit, async_finally) {
@@ -30,7 +32,14 @@ $(function() {
         }
     }
 
+    function filter_filename(file) {
+        var arr = file.split('.');
+        return arr.slice(0, arr.length - 1).join(' ');
+    }
     function process(data, info) {
+        $('.songname').html(filter_filename(info.file));
+        $('.songname').fadeTo(50, 1);
+
         source = context.createBufferSource()
         context.decodeAudioData(data, function(decoded) {
             source.buffer = decoded;

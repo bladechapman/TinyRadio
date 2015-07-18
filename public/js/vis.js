@@ -4,6 +4,7 @@ $(function() {
         c = 10;
 
     var bg_color = '#ECEFF1';
+    var line_color = '#546E7A'
 
     var nodes = [],
         links = [];
@@ -75,8 +76,8 @@ $(function() {
                 .attr('cx', 250)
                 .attr('cy', 250)
                 .attr('r', 200)
-                .style('stroke', 'black')
-                .style('stroke-width', 3)
+                .style('stroke', line_color)
+                .style('stroke-width', 4)
                 .style('fill', 'none');
             canvas.append('path')
                 .attr('class', 'bubble_tail')
@@ -84,13 +85,13 @@ $(function() {
                     var x = 250, y = 486;
                     return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
                 })
-                .style('stroke', 'black')
-                .style('stroke-width', 3)
+                .style('stroke', line_color)
+                .style('stroke-width', 4)
                 .style('fill', bg_color);
            canvas.append('path')
                 .attr('class', 'bubble_tail')
                 .attr('d', function(d) {
-                    var x = 250, y = 484;
+                    var x = 250, y = 483;
                     return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
                 })
                 .style('stroke', bg_color)

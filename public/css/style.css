@@ -67,3 +67,12 @@ footer img {
     height: 20vh;
     margin: 0 auto;
 }
+.info {
+    width: 100%;
+    height: 50px;
+    text-align: center;
+}
+.info .songname {
+    line-height: 50px;
+    opacity: 0;
+}
