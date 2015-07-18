@@ -6,6 +6,8 @@ $(function() {
     var source;
     var serverOffset; // server timestamp
 
+    setInterval(loadSound, 60000);
+
     $('.mobile_activate').click(function() {
         $('.mobile_activate').hide();
         oscillator = context.createOscillator();
@@ -52,6 +54,10 @@ $(function() {
         $('.songname').html(filter_filename(info.file));
         $('.songname').fadeTo(50, 1);
 
+        if (source) {
+            source.stop(0);
+        }
+
         source = context.createBufferSource()
         context.decodeAudioData(data, function(decoded) {
             source.buffer = decoded;
@@ -69,10 +75,6 @@ $(function() {
     }
 
     function loadSound() {
-        if (source) {
-            source.stop(0);
-        }
-
         var infoReq = new XMLHttpRequest();
         infoReq.open('GET', '/info', true);
         infoReq.responseType = 'json';
