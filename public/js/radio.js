@@ -6,6 +6,14 @@ $(function() {
     var source;
     var serverOffset; // server timestamp
 
+    $('.mobile_activate').click(function() {
+        $('.mobile_activate').hide();
+        oscillator = context.createOscillator();
+        oscillator.connect(context.destination);
+        oscillator.start(0);
+        oscillator.stop(0.01);
+    });
+
     ntp.init(socket, {
         interval : 333,
         buffer: 5
@@ -80,12 +88,14 @@ $(function() {
 
         songReq.onload = function() {
             data = songReq.response;
+            console.log('1');
             asyncNetwork();
         }
 
         infoReq.onreadystatechange = function() {
             if (infoReq.readyState == 4 && infoReq.status == 200) {
                 info = infoReq.response;
+                console.log('2');
                 asyncNetwork();
             }
         }

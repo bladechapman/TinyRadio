@@ -1,7 +1,11 @@
 html {
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
     background-color: #ECEFF1;
     font-family: 'Roboto', sans-serif;
+}
+body {
+    margin: 0;
 }
 #chart {
     display: block;
@@ -11,15 +15,28 @@ html {
     z-index: 2;
 }
 
+.mobile_activate {
+    height: 30px;
+    line-height: 30px;
+    width: 100%;
+    background-color: #546E7A;
+    text-align: center;
+    color: #ECEFF1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    -webkit-transition: all 0.1s linear;
+}
+.mobile_activate:hover {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
 .menu_wrapper {
     position: absolute;
     width: 100%;
 }
 .position_left {
-    transform: translateX(-30%);
+    -webkit-transform: translateX(-30%);
 }
 .position_right {
-    transform: translateX(30%);
+    -webkit-transform: translateX(30%);
 }
 .up_button {
     position: relative;
