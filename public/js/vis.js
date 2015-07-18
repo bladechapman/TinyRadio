@@ -132,19 +132,37 @@ $(function() {
         build_links(data);
     }
     function update() {
+        var last_color;
         node.remove();
-        node = canvas.selectAll('circle')
+        var node_parent = canvas.selectAll('circle')
                 .data(nodes)
                 .enter().append('g').attr('class', 'circle_group')
                 .on("mouseover", hover)
                 .on("mouseout", endHover)
+        node = node_parent
                 .append('circle')
+                .attr('id', function(datum) {
+                    return datum.name;
+                })
                 .attr('r', c)
                 .attr('fill', function() {
                     colors = Object.keys(palette);
                     color_key = colors[parseInt(Math.random() * colors.length)];
-                    return palette[color_key];
-                })
+                    last_color = palette[color_key];
+                    return last_color;
+                });
+
+        node_parent
+            .append('circle')
+            .attr('r', function(datum) {
+                if (datum.name === window.highlighted_name) {
+                    return c * 1.5;
+                }
+                return 0;
+            })
+            .style('fill', 'none')
+            .style('stroke', last_color)
+            .style('stroke-width', 2);
 
         force
             .nodes(nodes)

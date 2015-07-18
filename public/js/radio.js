@@ -9,7 +9,6 @@ $(function() {
     setInterval(loadSound, 60000);
 
     $('.mobile_activate').click(function() {
-        $('.mobile_activate').hide();
         oscillator = context.createOscillator();
         oscillator.connect(context.destination);
         oscillator.start(0);
@@ -26,7 +25,6 @@ $(function() {
     });
     socket.on('app:next_song', function() {
         loadSound();
-        window.__vis__updateGraph();
 
         $('.menu_wrapper').show();
         $('.menu_wrapper').fadeTo(50, 1);
@@ -51,6 +49,9 @@ $(function() {
         return arr.slice(0, arr.length - 1).join(' ');
     }
     function process(data, info) {
+        // window.__vis__highlightNodeByName(info.file);
+        window.highlighted_name = info.file;
+        window.__vis__updateGraph();
         $('.songname').html(filter_filename(info.file));
         $('.songname').fadeTo(50, 1);
 
@@ -95,14 +96,12 @@ $(function() {
 
         songReq.onload = function() {
             data = songReq.response;
-            console.log('1');
             asyncNetwork();
         }
 
         infoReq.onreadystatechange = function() {
             if (infoReq.readyState == 4 && infoReq.status == 200) {
                 info = infoReq.response;
-                console.log('2');
                 asyncNetwork();
             }
         }
