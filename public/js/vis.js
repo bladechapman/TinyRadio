@@ -1,5 +1,5 @@
 $(function() {
-    var w = 1000,
+    var w = 500,
         h = 500,
         c = 10;
 
@@ -40,8 +40,17 @@ $(function() {
 
     var chart_window = d3.select('#chart')
         .append('svg')
-        // .attr('width', w)
-        // .attr('height', h)
+
+        .attr("viewBox", function() {
+            var vp_width = $(window).width();
+            var vp_height = $(window).height();
+
+            return 0 + " " + 0 + " " + 500 + " " + 500;
+        })
+
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr('width', w)
+        .attr('height', h)
         .attr('class', 'chart');
 
     var canvas = chart_window.append('g')
@@ -61,7 +70,7 @@ $(function() {
             canvas.selectAll('.bubble_tail').remove();
             canvas.append('circle')
                 .attr('class', 'bubble_main')
-                .attr('cx', 500)
+                .attr('cx', 250)
                 .attr('cy', 250)
                 .attr('r', 200)
                 .style('stroke', 'black')
@@ -70,7 +79,7 @@ $(function() {
             canvas.append('path')
                 .attr('class', 'bubble_tail')
                 .attr('d', function(d) {
-                    var x = 500, y = 486;
+                    var x = 250, y = 486;
                     return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
                 })
                 .style('stroke', 'black')
@@ -79,7 +88,7 @@ $(function() {
            canvas.append('path')
                 .attr('class', 'bubble_tail')
                 .attr('d', function(d) {
-                    var x = 500, y = 484;
+                    var x = 250, y = 484;
                     return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
                 })
                 .style('stroke', 'white')
