@@ -23,8 +23,6 @@
             var offset = actual - expected;
             offsets.unshift(offset);
 
-            console.log(offsets);
-
             if (offsets.length > (options.buffer || 10)) {
                 offsets.pop();
             }
