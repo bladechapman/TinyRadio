@@ -13,6 +13,9 @@ $(function() {
     socket.on('app:next_song', function() {
         loadSound();
         window.__vis__updateGraph();
+
+        $('.menu_wrapper').show();
+        $('.menu_wrapper').fadeTo(50, 1);
     })
 
     function async(limit, async_finally) {

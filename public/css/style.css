@@ -26,6 +26,8 @@ html {
     margin: 0 auto;
     width: 50px;
     height: 50px;
+    line-height: 50px;
+    color: #ECEFF1;
     background-color: #4CAF50;
 }
 .down_button {
@@ -33,12 +35,21 @@ html {
     margin: 0 auto;
     width: 50px;
     height: 50px;
+    line-height: 55px;
+    color: #ECEFF1;
     background-color: #F44336;
 }
 .material_button {
+    -webkit-transition: all 0.1s linear;
+    z-index: 3;
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     border-radius: 50%;
     cursor: pointer;
+
+    text-align: center;
+}
+.material_button:hover {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
 .chart {
@@ -46,11 +57,11 @@ html {
     height: 50vh;
 }
 footer {
-    position: fixed;
     width: 100%;
-    z-index: 1
+    z-index: 1;
 }
 footer img {
+    z-index: 1;
     display: block;
     width: 20vh;
     height: 20vh;
