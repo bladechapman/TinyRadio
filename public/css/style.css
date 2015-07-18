@@ -105,10 +105,13 @@ footer img {
 }
 .info {
     width: 100%;
-    height: 50px;
+    height: 100px;
     text-align: center;
 }
 .info .songname {
     line-height: 50px;
     opacity: 0;
+}
+.info .song_header {
+    line-height: 50px;
 }
