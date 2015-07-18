@@ -6,16 +6,13 @@ $(function() {
     var source;
     var serverOffset; // server timestamp
 
-    $('#mobile_start').on('click', function() {
-        loadSound();
-    })
-
     ntp.init(socket, {
         interval : 333,
         buffer: 5
     });
     socket.on('app:next_song', function() {
         loadSound();
+        window.__vis__updateGraph();
     })
 
     function async(limit, async_finally) {
@@ -81,4 +78,4 @@ $(function() {
             }
         }
     }
-})
+});

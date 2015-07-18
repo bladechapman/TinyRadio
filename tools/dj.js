@@ -42,9 +42,6 @@ function DJ(path) {
         })
     }
 
-    // this.rateSelection = function(rating) {    // 1 : positive, 0 : negative
-        // this.selector.rateSelection(rating);
-    // }
     this.startNextTrack = function(callback) {
         var curDJ = this;
         callback = callback || function() {};

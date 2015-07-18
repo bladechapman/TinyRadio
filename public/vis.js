@@ -6,9 +6,6 @@ $(function() {
     var nodes = [],
         links = [];
 
-    // var test_data = {"back_c_major(classical).mp3":{"name":"back_c_major(classical).mp3","neighbors":{"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"gold_dust(electronic).mp3":{"name":"gold_dust(electronic).mp3","neighbors":{"back_c_major(classical).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":6,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":4}},"grans_vals(classical).mp3":{"name":"grans_vals(classical).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"love(pop).mp3":{"name":"love(pop).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"moonlight(classical).mp3":4,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"moonlight(classical).mp3":{"name":"moonlight(classical).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":4,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"pegboards(electronic).mp3":{"name":"pegboards(electronic).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":6,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"post man(pop).mp3":{"name":"post man(pop).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"scientist(electronic).mp3":{"name":"scientist(electronic).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":4,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"september(pop).mp3":5}},"september(pop).mp3":{"name":"september(pop).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":3}}};
-    // var data = {};
-
     var palette = {
         "lightgray": "#819090",
         "gray": "#708284",
@@ -62,7 +59,6 @@ $(function() {
         nodes = [];
         links = [];
         node = canvas.selectAll('circle');
-        link = canvas.selectAll('line');
     }
     function build_nodes(data) {
         for (var node_name in data) {
@@ -84,11 +80,6 @@ $(function() {
         }
     }
     function update() {
-        link.remove();
-        link = canvas.selectAll('line')
-                .data(links)
-                .enter().append('line')
-                .attr('stroke', palette.gray);
         node.remove();
         node = canvas.selectAll('circle')
                 .data(nodes)
@@ -108,13 +99,6 @@ $(function() {
         d3.selectAll('.circle_group').attr('transform', function(datum) {
             return 'translate(' + datum.x + ', ' + datum.y + ')';
         });
-
-        // TODO: remove this
-        // link
-        //     .attr('x1', function(d) {return d.source.x; })
-        //     .attr('y1', function(d) {return d.source.y; })
-        //     .attr('x2', function(d) {return d.target.x; })
-        //     .attr('y2', function(d) {return d.target.y; })
     }
     function hover(datum, index) {
         var g = d3.select(this);
@@ -146,4 +130,7 @@ $(function() {
             }
         }
     }
+
+    window.__vis__initializeGraph = initialize;
+    window.__vis__updateGraph = update;
 });
