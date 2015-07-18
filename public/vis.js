@@ -1,7 +1,7 @@
 $(function() {
     var w = 1000,
         h = 500,
-        c = 15;
+        c = 5;
 
     var nodes = [],
         links = [];
@@ -49,6 +49,7 @@ $(function() {
 
     initialize();
     function initialize() {
+        force.stop();
         updateData(function(err, data) {
             if (err) { console.log (err); return; }
             reset();
@@ -152,27 +153,5 @@ $(function() {
         }
     }
 
-    window.__vis__updateGraph = function() {
-        updateData(function(err, data) {
-            if (err) { console.log(err); return ;}
-            // build_nodes(data);
-            // for (var i = 0; i < links.length; i++) {
-            //     var cur_link = links[i];
-            //     var source_node_name = cur_link.source.name;
-            //     var target_node_name = cur_link.target.name;
-
-            //     var new_weight = data[source_node_name].neighbors[target_node_name];
-            //     if (new_weight && new_weight != cur_link.weight) {
-            //         cur_link.weight = new_weight;
-            //     }
-
-            // }
-
-            force.stop();
-            reset();
-            flatten_data(data);
-            // build_links(data);
-            update();
-        });
-    };
+    window.__vis__updateGraph = initialize;
 });
