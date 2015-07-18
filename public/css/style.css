@@ -1,11 +1,12 @@
 html {
-    overflow-x: hidden;
-    overflow-y: hidden;
+    overflow: hidden;
     background-color: #ECEFF1;
     font-family: 'Roboto', sans-serif;
 }
 body {
     margin: 0;
+    overflow: hidden;
+    position: relative;
 }
 #chart {
     display: block;
