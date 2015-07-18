@@ -1,5 +1,7 @@
 html {
     overflow: hidden;
+    background-color: #ECEFF1;
+    font-family: 'Roboto', sans-serif;
 }
 #chart {
     display: block;
@@ -8,6 +10,37 @@ html {
     background-color: transparent;
     z-index: 2;
 }
+
+.menu_wrapper {
+    position: absolute;
+    width: 100%;
+}
+.position_left {
+    transform: translateX(-30%);
+}
+.position_right {
+    transform: translateX(30%);
+}
+.up_button {
+    position: relative;
+    margin: 0 auto;
+    width: 50px;
+    height: 50px;
+    background-color: #4CAF50;
+}
+.down_button {
+    position: relative;
+    margin: 0 auto;
+    width: 50px;
+    height: 50px;
+    background-color: #F44336;
+}
+.material_button {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
 .chart {
     width: 50vh;
     height: 50vh;

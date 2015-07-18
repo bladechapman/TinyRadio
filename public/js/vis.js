@@ -3,6 +3,8 @@ $(function() {
         h = 500,
         c = 10;
 
+    var bg_color = '#ECEFF1';
+
     var nodes = [],
         links = [];
 
@@ -84,16 +86,16 @@ $(function() {
                 })
                 .style('stroke', 'black')
                 .style('stroke-width', 3)
-                .style('fill', 'white');
+                .style('fill', bg_color);
            canvas.append('path')
                 .attr('class', 'bubble_tail')
                 .attr('d', function(d) {
                     var x = 250, y = 484;
                     return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
                 })
-                .style('stroke', 'white')
+                .style('stroke', bg_color)
                 .style('stroke-width', 0)
-                .style('fill', 'white');
+                .style('fill', bg_color);
         });
     }
     function reset() {
