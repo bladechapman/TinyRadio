@@ -34,8 +34,19 @@ app.use(bodyParser.urlencoded({
         }, 3000);
     })
 
-    app.post('/skip', function(req, res) {
+    app.get('/err', function(req, res) {
+        var undef = undefined;
+        var err = undef.udef_attr;
+        res.json({
+            'message' : '[ERROR]'
+        })
+    })
+
+    app.get('/skip', function(req, res) {
         dj.startNextTrack()
+        res.json({
+            'message' : '[SUCCESS]'
+        })
     })
 
     app.post('/vote', function(req, res) {
@@ -69,8 +80,16 @@ function gracefulExit() {
     dj.selector.saveMetadata();
     process.exit();
 }
+function logError(err) {
+    console.log('HEY HEY HEY');
+    var date = '[' + new Date() + ']\n';
+    fs.writeFileSync('./err_log.txt', date + err);
+    process.exit();
+}
 process.on('SIGTERM', gracefulExit);
 process.on('SIGINT', gracefulExit);
+process.on('uncaughtException', logError);
+process.on('TypeError', logError);
 
 http.listen(8000, function() {
     console.log('listening on port 8000');
