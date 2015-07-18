@@ -6,7 +6,7 @@ $(function() {
     var source;
     var serverOffset; // server timestamp
 
-    setInterval(loadSound, 45000);
+    setInterval(loadSound, 30000);
 
     $('.mobile_activate').click(function() {
         oscillator = context.createOscillator();
