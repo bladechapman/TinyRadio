@@ -132,7 +132,6 @@ $(function() {
         build_links(data);
     }
     function update() {
-        var last_color;
         node.remove();
         var node_parent = canvas.selectAll('circle')
                 .data(nodes)
@@ -145,11 +144,12 @@ $(function() {
                     return datum.name;
                 })
                 .attr('r', c)
-                .attr('fill', function() {
-                    colors = Object.keys(palette);
-                    color_key = colors[parseInt(Math.random() * colors.length)];
-                    last_color = palette[color_key];
-                    return last_color;
+                .attr('fill', function(datum) {
+                    var colors = Object.keys(palette);
+                    var color_key = colors[parseInt(Math.random() * colors.length)];
+                    var color = palette[color_key];
+                    datum.color = color;
+                    return color;
                 });
 
         node_parent
@@ -161,7 +161,9 @@ $(function() {
                 return 0;
             })
             .style('fill', 'none')
-            .style('stroke', last_color)
+            .style('stroke', function(datum) {
+                return datum.color || palette.blue;
+            })
             .style('stroke-width', 2);
 
         force

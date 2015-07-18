@@ -49,7 +49,6 @@ $(function() {
         return arr.slice(0, arr.length - 1).join(' ');
     }
     function process(data, info) {
-        // window.__vis__highlightNodeByName(info.file);
         window.highlighted_name = info.file;
         window.__vis__updateGraph();
         $('.songname').html(filter_filename(info.file));
