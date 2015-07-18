@@ -1,13 +1,13 @@
-(function() {
-    var w = 500,
+$(function() {
+    var w = 1000,
         h = 500,
         c = 15;
 
     var nodes = [],
         links = [];
 
-    var test_data = {"back_c_major(classical).mp3":{"name":"back_c_major(classical).mp3","neighbors":{"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"gold_dust(electronic).mp3":{"name":"gold_dust(electronic).mp3","neighbors":{"back_c_major(classical).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":6,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":4}},"grans_vals(classical).mp3":{"name":"grans_vals(classical).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"love(pop).mp3":{"name":"love(pop).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"moonlight(classical).mp3":4,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"moonlight(classical).mp3":{"name":"moonlight(classical).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":4,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"pegboards(electronic).mp3":{"name":"pegboards(electronic).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":6,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"post man(pop).mp3":{"name":"post man(pop).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"scientist(electronic).mp3":{"name":"scientist(electronic).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":4,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"september(pop).mp3":5}},"september(pop).mp3":{"name":"september(pop).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":3}}};
-    // var test_data = {};
+    // var test_data = {"back_c_major(classical).mp3":{"name":"back_c_major(classical).mp3","neighbors":{"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"gold_dust(electronic).mp3":{"name":"gold_dust(electronic).mp3","neighbors":{"back_c_major(classical).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":6,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":4}},"grans_vals(classical).mp3":{"name":"grans_vals(classical).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"love(pop).mp3":{"name":"love(pop).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"moonlight(classical).mp3":4,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"moonlight(classical).mp3":{"name":"moonlight(classical).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":4,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"pegboards(electronic).mp3":{"name":"pegboards(electronic).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":6,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"post man(pop).mp3":{"name":"post man(pop).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"scientist(electronic).mp3":5,"september(pop).mp3":5}},"scientist(electronic).mp3":{"name":"scientist(electronic).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":4,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"september(pop).mp3":5}},"september(pop).mp3":{"name":"september(pop).mp3","neighbors":{"back_c_major(classical).mp3":5,"gold_dust(electronic).mp3":5,"grans_vals(classical).mp3":5,"love(pop).mp3":5,"moonlight(classical).mp3":5,"pegboards(electronic).mp3":5,"post man(pop).mp3":5,"scientist(electronic).mp3":3}}};
+    // var data = {};
 
     var palette = {
         "lightgray": "#819090",
@@ -50,10 +50,13 @@
 
     initialize();
     function initialize() {
-        reset();
-        build_nodes(test_data);
+        updateData(function(err, data) {
+            if (err) { console.log (err); return; }
+            reset();
+            build_nodes(data);
 
-        update();
+            update();
+        });
     }
     function reset() {
         nodes = [];
@@ -91,7 +94,7 @@
                 .data(nodes)
                 .enter().append('g').attr('class', 'circle_group')
                 .on("mouseover", hover)
-                .on("mouseout", end_hover)
+                .on("mouseout", endHover)
                 .append('circle')
                 .attr('r', c)
                 .attr('fill', palette.blue)
@@ -121,8 +124,26 @@
             .attr('class', 'info')
             .text(datum.name);
     }
-    function end_hover(datum, index) {
+    function endHover(datum, index) {
         var g = d3.select(this);
         g.select('text').remove();
     }
-})();
+    function updateData(callback) {
+        var dataReq = new XMLHttpRequest();
+        dataReq.open('GET', '/nodes', true);
+        dataReq.responseType = 'json';
+
+        dataReq.send();
+        dataReq.onreadystatechange = function() {
+            if (dataReq.readyState == 4 && dataReq.status == 200) {
+                var data = dataReq.response.data;
+                callback(null, data);
+            }
+            else if (dataReq.readyState == "complete" && dataReq.status != 200) {
+                callback({
+                    'message' : 'Error retrieving node data'
+                }, null);
+            }
+        }
+    }
+});

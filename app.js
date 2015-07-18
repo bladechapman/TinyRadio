@@ -34,45 +34,41 @@ app.use(bodyParser.urlencoded({
         }, 3000);
     })
 
-    app.get('/err', function(req, res) {
-        var undef = undefined;
-        var err = undef.udef_attr;
+    app.get('/nodes', function(req, res) {
         res.json({
-            'message' : '[ERROR]'
-        })
-    })
-
+            'message': '[SUCCESS]',
+            'data': dj.selector.getNodes()
+        });
+    });
     app.get('/skip', function(req, res) {
         dj.startNextTrack()
         res.json({
-            'message' : '[SUCCESS]'
+            'message': '[SUCCESS]'
         })
-    })
-
+    });
     app.post('/vote', function(req, res) {
         if (req.body.vote === undefined || (req.body.vote != 1 && req.body.vote != 0)) {
             res.json({
-                'message' : '[ERROR] invalid vote value',
+                'message': '[ERROR] invalid vote value',
             })
             return;
         }
 
         dj.selector.rateSelection(req.body.vote);
         res.json({'message' : '[SUCCESS]'})
-    })
-
+    });
     app.get('/info', function(req, res) {
         res.json({
-            songTimestamp : dj.startTimestamp,
-            servTimestamp : Date.now(),
+            songTimestamp: dj.startTimestamp,
+            servTimestamp: Date.now(),
             file : dj.curSong
         });
-    })
+    });
     app.get('/song', function(req, res) {
         res.set({'Content-Type': 'audio/mpeg'});
         var readStream = fs.createReadStream("sound/" + dj.curSong);
         readStream.pipe(res);
-    })
+    });
 })();
 
 function gracefulExit() {
@@ -80,17 +76,9 @@ function gracefulExit() {
     dj.selector.saveMetadata();
     process.exit();
 }
-function logError(err) {
-    console.log('HEY HEY HEY');
-    var date = '[' + new Date() + ']\n';
-    fs.writeFileSync('./err_log.txt', date + err);
-    process.exit();
-}
 process.on('SIGTERM', gracefulExit);
 process.on('SIGINT', gracefulExit);
-process.on('uncaughtException', logError);
-process.on('TypeError', logError);
 
 http.listen(8000, function() {
     console.log('listening on port 8000');
-})
+});

@@ -48,6 +48,9 @@ function Selector(data, meta_path) {
             console.log('Okay! *continues to ignore you*');
         }
     }
+    this.getNodes = function() {
+        return nodes;
+    }
     this.findNode = function(name) {
         return nodes[name];
     }
