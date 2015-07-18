@@ -24,7 +24,7 @@ $(function() {
         .charge(-.0000001)
         .gravity(0.2)
         .linkDistance(function(datum) {
-            return parseInt(700/datum.weight);
+            return parseInt(300/datum.weight);
         })
         .size([w, h])
         .on("tick", tick);
