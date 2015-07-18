@@ -1,7 +1,7 @@
 $(function() {
     var w = 1000,
         h = 500,
-        c = 5;
+        c = 10;
 
     var nodes = [],
         links = [];
@@ -40,8 +40,8 @@ $(function() {
 
     var chart_window = d3.select('#chart')
         .append('svg')
-        .attr('width', w)
-        .attr('height', h)
+        // .attr('width', w)
+        // .attr('height', h)
         .attr('class', 'chart');
 
     var canvas = chart_window.append('g')
@@ -55,6 +55,36 @@ $(function() {
             reset();
             flatten_data(data);
             update();
+
+
+            canvas.selectAll('.bubble_main').remove();
+            canvas.selectAll('.bubble_tail').remove();
+            canvas.append('circle')
+                .attr('class', 'bubble_main')
+                .attr('cx', 500)
+                .attr('cy', 250)
+                .attr('r', 200)
+                .style('stroke', 'black')
+                .style('stroke-width', 3)
+                .style('fill', 'none');
+            canvas.append('path')
+                .attr('class', 'bubble_tail')
+                .attr('d', function(d) {
+                    var x = 500, y = 486;
+                    return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
+                })
+                .style('stroke', 'black')
+                .style('stroke-width', 3)
+                .style('fill', 'white');
+           canvas.append('path')
+                .attr('class', 'bubble_tail')
+                .attr('d', function(d) {
+                    var x = 500, y = 484;
+                    return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
+                })
+                .style('stroke', 'white')
+                .style('stroke-width', 0)
+                .style('fill', 'white');
         });
     }
     function reset() {
