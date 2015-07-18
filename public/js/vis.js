@@ -12,7 +12,7 @@ $(function() {
     var cached_data = {};
 
     var palette = {
-        "yellow": "#FFEE58",
+        "yellow": "#F9A825",
         "red": "#FF1744",
         "pink": "#F48FB1",
         "purple": "#E040FB",

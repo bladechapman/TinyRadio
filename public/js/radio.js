@@ -12,11 +12,15 @@ $(function() {
         oscillator.connect(context.destination);
         oscillator.start(0);
         oscillator.stop(0.01);
+
+        loadSound();
     });
 
     ntp.init(socket, {
-        interval : 333,
-        buffer: 5
+        interval : 200,
+        decay : 0,
+        decayLimit : 60000,
+        buffer: 20
     });
     socket.on('app:next_song', function() {
         loadSound();
