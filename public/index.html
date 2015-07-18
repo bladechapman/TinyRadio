@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <script type="text/javascript" src="./lib/socket.io-client/socket.io.js"></script>
+        <script type="text/javascript" src="./lib/jquery/dist/jquery.min.js"></script>
+        <script type="text/javascript" src="./ntp-client.js"></script>
+        <script type="text/javascript" src="./radio.js"></script>
+    </head>
 
-<head>
-    <script type="text/javascript" src="./lib/socket.io-client/socket.io.js"></script>
-    <script type="text/javascript" src="./lib/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="./ntp-client.js"></script>
-    <script type="text/javascript" src="./index.js"></script>
-</head>
+    <body>
+        <div id="chart"></div>
+    </body>
 
-<body>
-    <!-- <button type="button" id="mobile_start"> On mobile? Try clicking here </button> -->
-</body>
-
-
+    <footer>
+        <script type="text/javascript" src="./lib/d3/d3.min.js"></script>
+        <script type="text/javascript" src="./vis.js"></script>
+    </footer>
 </html>

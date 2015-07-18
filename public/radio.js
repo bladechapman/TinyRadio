@@ -12,8 +12,6 @@ $(function() {
 
     ntp.init(socket, {
         interval : 333,
-        decay : 500,
-        decayLimit : 60000,
         buffer: 5
     });
     socket.on('app:next_song', function() {
@@ -83,5 +81,4 @@ $(function() {
             }
         }
     }
-
 })
