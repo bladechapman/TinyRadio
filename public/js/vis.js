@@ -1,16 +1,17 @@
 $(function() {
+    var force,
+        chart_window,
+        canvas,
+        bg,
+        fg;
     var w = 500,
         h = 500,
         c = 10;
-
-    var bg_color = '#ECEFF1';
-    var line_color = '#546E7A'
-
+    var bg_color = '#ECEFF1',
+        line_color = '#546E7A';
     var nodes = [],
-        links = [];
-
-    var cached_data = {};
-
+        links = [],
+        cached_data = {};
     var palette = {
         "yellow": "#F9A825",
         "red": "#FF1744",
@@ -20,77 +21,100 @@ $(function() {
         "green": "#00E676",
     };
 
-    var force = d3.layout.force()
-        .charge(-.0000001)
-        .gravity(0.2)
-        .linkDistance(function(datum) {
-            return parseInt(300/datum.weight);
-        })
-        .size([w, h])
-        .on("tick", tick);
-
-    var chart_window = d3.select('#chart')
-        .append('svg')
-
-        .attr("viewBox", function() {
-            var vp_width = $(window).width();
-            var vp_height = $(window).height();
-
-            return 0 + " " + 0 + " " + 500 + " " + 500;
-        })
-
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr('width', w)
-        .attr('height', h)
-        .attr('class', 'chart');
-
-    var canvas = chart_window.append('g')
-        .attr('id', 'canvas');
-
+    drawBG();
     initialize();
+    function drawBG() {
+        force = d3.layout.force()
+            .charge(-.0000001)
+            .gravity(0.2)
+            .linkDistance(function(datum) {
+                return parseInt(300/datum.weight);
+            })
+            .size([w, h])
+            .on("tick", tick);
+
+        chart_window = d3.select('#chart')
+            .append('svg')
+            .attr("viewBox", "0 0 500 500")
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr('width', w)
+            .attr('height', h)
+            .attr('class', 'chart');
+
+        canvas = chart_window.append('g')
+            .attr('id', 'canvas');
+        fg = canvas.append('g')
+            .attr('id', 'fg');
+        bg = canvas.append('g')
+            .attr('id', 'bg');
+
+        bg.selectAll('.bubble_main').remove();
+        bg.selectAll('.bubble_tail').remove();
+        bg.append('circle')
+            .attr('class', 'bubble_main')
+            .attr('cx', 250)
+            .attr('cy', 250)
+            .attr('r', 200)
+            .style('stroke', line_color)
+            .style('stroke-width', 4)
+            .style('fill', 'none');
+        bg.append('path')
+            .attr('class', 'bubble_tail')
+            .attr('d', function(d) {
+                var x = 250, y = 486;
+                return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
+            })
+            .style('stroke', line_color)
+            .style('stroke-width', 4)
+            .style('fill', bg_color);
+        bg.append('path')
+            .attr('class', 'bubble_tail')
+            .attr('d', function(d) {
+                var x = 250, y = 483;
+                return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
+            })
+            .style('stroke', bg_color)
+            .style('stroke-width', 0)
+            .style('fill', bg_color);
+    };
     function initialize() {
         force.stop();
         updateData(function(err, data) {
-            if (err) { console.log (err); return; }
+            if (err) {
+                console.log (err);
+                return;
+            }
             reset();
             flatten_data(data);
             update();
-
-
-            canvas.selectAll('.bubble_main').remove();
-            canvas.selectAll('.bubble_tail').remove();
-            canvas.append('circle')
-                .attr('class', 'bubble_main')
-                .attr('cx', 250)
-                .attr('cy', 250)
-                .attr('r', 200)
-                .style('stroke', line_color)
-                .style('stroke-width', 4)
-                .style('fill', 'none');
-            canvas.append('path')
-                .attr('class', 'bubble_tail')
-                .attr('d', function(d) {
-                    var x = 250, y = 486;
-                    return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
-                })
-                .style('stroke', line_color)
-                .style('stroke-width', 4)
-                .style('fill', bg_color);
-           canvas.append('path')
-                .attr('class', 'bubble_tail')
-                .attr('d', function(d) {
-                    var x = 250, y = 483;
-                    return 'M ' + x + ' ' + y + ' l -40 -40 l 80 0 z';
-                })
-                .style('stroke', bg_color)
-                .style('stroke-width', 0)
-                .style('fill', bg_color);
         });
+    }
+    function updateData(callback) {
+        var dataReq = new XMLHttpRequest();
+        dataReq.open('GET', '/nodes', true);
+        dataReq.responseType = 'json';
+
+        dataReq.send();
+        dataReq.onreadystatechange = function() {
+            if (dataReq.readyState == 4 && dataReq.status == 200) {
+                var data = dataReq.response.data;
+                callback(null, data);
+            }
+            else if (dataReq.readyState == "complete" && dataReq.status != 200) {
+                callback({
+                    'message' : 'Error retrieving node data'
+                }, null);
+            }
+        }
     }
     function reset() {
         nodes = [];
         links = [];
-        node = canvas.selectAll('circle');
+        node_parent = fg.selectAll('.circle_group');
+    }
+    function flatten_data(data) {
+        build_nodes(data);
+        build_links(data);
     }
     function build_nodes(data) {
         for (var node_name in data) {
@@ -121,19 +145,14 @@ $(function() {
                     target: target.node,
                     weight: (cur_to_target_weight + target_to_cur_weight)/2
                 }
-
                 links.push(new_link);
             }
-
         }
     }
-    function flatten_data(data) {
-        build_nodes(data);
-        build_links(data);
-    }
     function update() {
-        node.remove();
-        var node_parent = canvas.selectAll('circle')
+        endHover();
+        node_parent.remove();
+        node_parent = fg.selectAll('.circle_group')
                 .data(nodes)
                 .enter().append('g').attr('class', 'circle_group')
                 .on("mouseover", hover)
@@ -143,6 +162,7 @@ $(function() {
                 .attr('id', function(datum) {
                     return datum.name;
                 })
+                .attr('class', 'node')
                 .attr('r', c)
                 .attr('fill', function(datum) {
                     var colors = Object.keys(palette);
@@ -151,7 +171,6 @@ $(function() {
                     datum.color = color;
                     return color;
                 });
-
         node_parent
             .append('circle')
             .attr('r', function(datum) {
@@ -165,7 +184,6 @@ $(function() {
                 return datum.color || palette.blue;
             })
             .style('stroke-width', 2);
-
         force
             .nodes(nodes)
             .links(links)
@@ -185,25 +203,11 @@ $(function() {
             .text(datum.name);
     }
     function endHover(datum, index) {
-        var g = d3.select(this);
-        g.select('text').remove();
-    }
-    function updateData(callback) {
-        var dataReq = new XMLHttpRequest();
-        dataReq.open('GET', '/nodes', true);
-        dataReq.responseType = 'json';
-
-        dataReq.send();
-        dataReq.onreadystatechange = function() {
-            if (dataReq.readyState == 4 && dataReq.status == 200) {
-                var data = dataReq.response.data;
-                callback(null, data);
-            }
-            else if (dataReq.readyState == "complete" && dataReq.status != 200) {
-                callback({
-                    'message' : 'Error retrieving node data'
-                }, null);
-            }
+        if (!datum && !index) {
+            fg.selectAll('text').remove();
+        } else {
+            var g = d3.select(this);
+            g.select('text').remove();
         }
     }
 
