@@ -1,6 +1,6 @@
 var fs = require('fs');
 var childProcess = require('child_process');
-var SelectionEngine = require('./engine');
+var Selector = require('./engine');
 var filepathConvert = require('./filepath-convert');
 
 function DJ(path) {
@@ -10,7 +10,7 @@ function DJ(path) {
     this.startTimestamp = 0;
     this.curSong;
     this.events = {}    // name, callbacks
-    this.selector = new SelectionEngine(filterDirectory(this.path));
+    this.selector = new Selector(filterDirectory(this.path));
 
     this.registerEvent('next_song');
 
@@ -19,8 +19,23 @@ function DJ(path) {
     // traversal has entropy, which determines how much the dj can go 'upstream'
 
     function filterDirectory(path) {
-        var ret = []
-        var files = fs.readdirSync(path);
+        var files = [];
+        var ret = [];
+
+        try {
+            var stats = fs.lstatSync(path);
+            if (stats.isDirectory()) { files = fs.readdirSync(path); }
+            else { except(); }
+        }
+        catch (err) { except(); }
+        function except() {
+            console.log("Looks like you don't have any sounds. Try adding some to " + path);
+            try { fs.mkdirSync(path); }
+            catch(err) { console.log("Could not create " + path + ". This directory may already exist, but with no sounds."); }
+            process.exit();
+        }
+
+        if (files.length === 0) { except(); }
         files.forEach(function(element) {
             var convertedPath = path + element;
             if(fs.statSync(convertedPath).isFile()) {
@@ -78,20 +93,11 @@ DJ.prototype.registerEvent = function(eventName) {
     this.events[eventName] = []  // callbacks are empty
 }
 DJ.prototype.addEventListener = function(eventName, callback) {
-    if (!this.events[eventName]) { return;}
+    if (!this.events[eventName]) { return; }
     this.events[eventName].push(callback);
-    // console.log('listener added at index: ' + this.events[eventName].indexOf(callback));
-    // console.log('total number of event handlers: ' + this.events[eventName].length);
 }
 DJ.prototype.removeEventListener = function(eventName, callback) {
-
-    if (!callback || this.events[eventName].indexOf(callback) == -1) {
-        // console.log('callback not found for removal');
-        return;
-    }
-
-    // console.log('removing callback at index: ' + this.events[eventName].indexOf(callback));
-
+    if (!callback || this.events[eventName].indexOf(callback) == -1) { return; }
     if (this.events[eventName].length >= 2) {
         console.log(this.events[eventName][0] == this.events[eventName][1]);
     }

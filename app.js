@@ -4,7 +4,7 @@ var fs = require('fs');
 var bodyParser = require('body-parser');
 var DJ = require('./tools/dj');
 
-var dj = new DJ('sound/');
+var dj = new DJ('./sound/');
 
 var app = express();
 var http = require('http').Server(app);

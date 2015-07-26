@@ -101,7 +101,7 @@ function Selector(data, meta_path) {
         console.log('Valid sound metadata not found, generating new...');
         nodes = {};
         initializeGraph();
-        console.log('[SUCCESS] ' + meta_path + 'sound_meta.json');
+        console.log('[SUCCESS] ' + meta_path + 'sound_meta.json will be created upon server restart. Internal states currently being used.');
     }
 }
 
