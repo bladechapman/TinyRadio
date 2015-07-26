@@ -75,12 +75,9 @@ function Selector(data, meta_path) {
         var file;
         if (origin === '' || origin === undefined) {    // initially just pick a random node
             file = nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
-            // console.log(sampleWeighted(nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].neighbors));
         }
         else {
             var originNode = this.findNode(origin);
-            // var files = originNode.neighbors;
-            // file = Object.keys(files)[parseInt(Math.random() * Object.keys(files).length)];     // TODO: implement better picking
             var file = sampleWeighted(originNode.neighbors);
         }
 

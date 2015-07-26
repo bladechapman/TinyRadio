@@ -6,6 +6,11 @@ var filepathConvert = require('./filepath-convert');
 function DJ(path) {
     var timout;
     var songBuffer = 3000;
+    var type_whitelist = {
+        'mp4' : true,
+        'mp3' : true,
+        'wav' : true
+    };
     this.path = path;
     this.startTimestamp = 0;
     this.curSong;
@@ -37,54 +42,53 @@ function DJ(path) {
 
         if (files.length === 0) { except(); }
         files.forEach(function(element) {
-            var convertedPath = path + element;
-            if(fs.statSync(convertedPath).isFile()) {
-                ret.push(element);
-            }
+            var converted_path = path + element;
+            var path_components = element.split('.');
+            if(fs.statSync(converted_path).isFile() && path_components[path_components.length - 1] in type_whitelist) { ret.push(element); }
         });
         return ret;
     }
     function findDuration(path, callback) {
         childProcess.exec('ffmpeg -i ' + path, function(error, stdout, stderr) {
-            var durString = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
-            var durStringArr = durString.split('.')[0].split(':');
-            durStringArr.push(durString.split('.')[1].substring(0, 2));
+            var dur_string = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
+            var dur_string_arr = dur_string.split('.')[0].split(':');
+            dur_string_arr.push(dur_string.split('.')[1].substring(0, 2));
 
-            callback(parseInt(durStringArr[0]) * 360 * 1000 +
-                    parseInt(durStringArr[1]) * 60 * 1000 +
-                    parseInt(durStringArr[2]) * 1000 +
-                    parseInt(durStringArr[3]));
+            callback(parseInt(dur_string_arr[0]) * 360 * 1000 +
+                    parseInt(dur_string_arr[1]) * 60 * 1000 +
+                    parseInt(dur_string_arr[2]) * 1000 +
+                    parseInt(dur_string_arr[3]));
         })
     }
 
     this.startNextTrack = function(callback) {
-        var curDJ = this;
+        var cur_dj = this;
         callback = callback || function() {};
-        fs.readdir(curDJ.path, function(err, files) {
+        fs.readdir(cur_dj.path, function(err, files) {
             // for now, just return random
             // eventually convert this into an LRU cache
-            var file = curDJ.selector.selectFrom(curDJ.curSong);
+            var file = cur_dj.selector.selectFrom(cur_dj.curSong);
 
             try {
-                findDuration(curDJ.path + filepathConvert.convertTo(file), function(duration) {
+                findDuration(cur_dj.path + filepathConvert.convertTo(file), function(duration) {
                     // duration needs to be adjusted to playback speed of Audio API player
                     console.log('Selected file: ' + file);
 
                     clearTimeout(timout);
                     timout = setTimeout(function() {
-                        curDJ.startNextTrack(function() {});
+                        cur_dj.startNextTrack(function() {});
                     }, duration + songBuffer);
 
-                    curDJ.startTimestamp = Date.now();
-                    curDJ.curSong = file;
-                    curDJ.dispatchEvent('next_song');
+                    cur_dj.startTimestamp = Date.now();
+                    cur_dj.curSong = file;
+                    cur_dj.dispatchEvent('next_song');
 
-                    callback(curDJ.curSong);
+                    callback(cur_dj.curSong);
                 })
             }
             catch(err) {
                 console.log('[ERROR] Cannot read file ' + file + ', trying again');
-                curDJ.startNextTrack(function() {});
+                cur_dj.startNextTrack(function() {});
             }
         })
     }
@@ -97,7 +101,7 @@ DJ.prototype.addEventListener = function(eventName, callback) {
     this.events[eventName].push(callback);
 }
 DJ.prototype.removeEventListener = function(eventName, callback) {
-    if (!callback || this.events[eventName].indexOf(callback) == -1) { return; }
+    if (!callback || this.events[eventName].indexOf(callback) === -1) { return; }
     if (this.events[eventName].length >= 2) {
         console.log(this.events[eventName][0] == this.events[eventName][1]);
     }

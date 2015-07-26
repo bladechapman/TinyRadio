@@ -4,13 +4,18 @@ var fs = require('fs');
 var bodyParser = require('body-parser');
 var DJ = require('./tools/dj');
 
-var dj = new DJ('./sound/');
-
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var ntp = require('./tools/ntp-server');
 
+var sound_target = './sound/';
+var type_index = process.argv.indexOf('-source');
+if (type_index !== -1 && process.argv[type_index + 1]) {
+    sound_target = process.argv[type_index + 1];
+    if (sound_target.charAt(sound_target.length - 1) !== '/') { sound_target += '/'; }
+}
+var dj = new DJ(sound_target);
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
