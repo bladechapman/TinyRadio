@@ -31,7 +31,8 @@ function Selector(data, meta_path) {
             if (rand <= list[i].accumulation) { return list[i].node}
         }
     }
-    function initializeGraph() {
+    this.initializeGraph = function() {
+        nodes = {};
         if (data) {
             for (var i = 0; i < data.length; i++) {
                 curSelector.addNode(data[i]);
@@ -54,22 +55,28 @@ function Selector(data, meta_path) {
     this.findNode = function(name) {
         return nodes[name];
     }
-    this.addNode = function(new_name) {     // maintains complete, bi-directional graph
-        var newNode = new Node(new_name);
+    this.addNode = function(name) {     // maintains complete, bi-directional graph
+        var newNode = new Node(name);
         for (var node_name in nodes) {
-            if (meta_data && meta_data[new_name] && meta_data[new_name].neighbors && meta_data[new_name].neighbors[node_name]) {
-                newNode.neighbors[node_name] = meta_data[new_name].neighbors[node_name];
+            if (meta_data && meta_data[name] && meta_data[name].neighbors && meta_data[name].neighbors[node_name]) {
+                newNode.neighbors[node_name] = meta_data[name].neighbors[node_name];
             } else {
                 newNode.neighbors[node_name] = initial_ranking;
             }
 
-            if (meta_data && meta_data[node_name] && meta_data[node_name].neighbors && meta_data[node_name].neighbors[new_name]) {
-                nodes[node_name].neighbors[newNode.name] = meta_data[node_name].neighbors[new_name];
+            if (meta_data && meta_data[node_name] && meta_data[node_name].neighbors && meta_data[node_name].neighbors[name]) {
+                nodes[node_name].neighbors[newNode.name] = meta_data[node_name].neighbors[name];
             } else {
                 nodes[node_name].neighbors[newNode.name] = initial_ranking;
             }
         }
         nodes[newNode.name] = newNode;
+    }
+    this.removeNode = function(name) {
+        delete nodes[name];
+        for (var node in nodes) {
+            delete nodes[node].neighbors[name];
+        }
     }
     this.selectFrom = function(origin) {
         var file;
@@ -92,12 +99,11 @@ function Selector(data, meta_path) {
 
     try {
         meta_data = JSON.parse(fs.readFileSync(meta_path + 'sound_meta.json', {encoding: 'utf8'}));
-        initializeGraph();
+        curSelector.initializeGraph();
     }
     catch (err) {
         console.log('Valid sound metadata not found, generating new...');
-        nodes = {};
-        initializeGraph();
+        curSelector.initializeGraph();
         console.log('[SUCCESS] ' + meta_path + 'sound_meta.json will be created upon server restart. Internal states currently being used.');
     }
 }

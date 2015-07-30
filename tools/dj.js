@@ -4,6 +4,7 @@ var Selector = require('./engine');
 var filepathConvert = require('./filepath-convert');
 
 function DJ(path) {
+    var cur_dj = this;
     var timout;
     var songBuffer = 3000;
     var type_whitelist = {
@@ -19,9 +20,22 @@ function DJ(path) {
 
     this.registerEvent('next_song');
 
-    // represent songs as a connected graph
-    // weight the graph according to suggestions
-    // traversal has entropy, which determines how much the dj can go 'upstream'
+    fs.watch(path, {
+        'persistent' : false
+    }, function(event, filename) {
+        var new_files = filterDirectory(path);
+        var nodes = cur_dj.selector.getNodes();
+
+        if (new_files.length < Object.keys(nodes).length) {
+            cur_dj.selector.removeNode(filename);
+            console.log(filename + ' removed');
+        } else if (new_files.length > Object.keys(nodes).length) {
+            cur_dj.selector.addNode(filename);
+            console.log(filename + ' added');
+        }
+
+        // console.log(new_files);
+    })
 
     function filterDirectory(path) {
         var files = [];
@@ -44,7 +58,7 @@ function DJ(path) {
         files.forEach(function(element) {
             var converted_path = path + element;
             var path_components = element.split('.');
-            if(fs.statSync(converted_path).isFile() && path_components[path_components.length - 1] in type_whitelist) { ret.push(element); }
+            if(fs.lstatSync(converted_path).isFile() && path_components[path_components.length - 1] in type_whitelist) { ret.push(element); }
         });
         return ret;
     }
@@ -62,7 +76,6 @@ function DJ(path) {
     }
 
     this.startNextTrack = function(callback) {
-        var cur_dj = this;
         callback = callback || function() {};
         fs.readdir(cur_dj.path, function(err, files) {
             // for now, just return random
