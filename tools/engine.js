@@ -55,7 +55,7 @@ function Selector(data, meta_path) {
     this.findNode = function(name) {
         return nodes[name];
     }
-    this.addNode = function(name) {     // maintains complete, bi-directional graph
+    this.addNode = function(name) {
         var newNode = new Node(name);
         for (var node_name in nodes) {
             if (meta_data && meta_data[name] && meta_data[name].neighbors && meta_data[name].neighbors[node_name]) {

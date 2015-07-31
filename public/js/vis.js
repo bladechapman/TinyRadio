@@ -28,7 +28,7 @@ $(function() {
             .charge(-.0000001)
             .gravity(0.2)
             .linkDistance(function(datum) {
-                return parseInt(300/datum.weight);
+                return parseInt(400/datum.weight);
             })
             .size([w, h])
             .on("tick", tick);
@@ -193,22 +193,72 @@ $(function() {
         d3.selectAll('.circle_group').attr('transform', function(datum) {
             return 'translate(' + datum.x + ', ' + datum.y + ')';
         });
+        // d3.selectAll('.circle_group')
+            // .attr('cx', function(datum) { return datum.x; })
+            // .attr('cy', function(datum) { return datum.y; })
+
+
+        // console.log($('#fg'));
+        // console.log($('#fg')[0].getBBox().width);
+
+        // console.log($('#fg')[0].getBoundingClientRect().width);
+        d3.select('#fg').attr('transform', function() {
+            var bBox = $('#fg')[0].getBBox();
+            var bRect = $('#fg')[0].getBoundingClientRect();
+            var scale_regex = /scale\((\d+(?:\.\d+)?), (\d+(?:\.\d+)?)\)/
+            var transform_str = $('#fg').attr('transform');
+            var scale_vals = (transform_str) ? transform_str.match(scale_regex) : undefined;
+            var old_scale_x = 1;
+            var old_scale_y = 1;
+            if (scale_vals) {
+                old_scale_x = scale_vals[1];
+                old_scale_y = scale_vals[2];
+            };
+
+            // d3.selectAll('.test').remove();
+            // d3.select('#canvas').append('circle').attr('r', 3).attr('cx', bBox.x).attr('cy', bBox.y).style('stroke', '#000000').style('stroke-width', 1).style('fill', '#000000').attr('class', 'test');
+            // d3.select('#canvas').append('circle').attr('r', 3).attr('cx', 0).attr('cy', 0).style('stroke', palette.purple).style('stroke-width', 1).style('fill', palette.purple).attr('class', 'test');
+            // console.log(bBox);
+
+            var orig_width = bBox.width;
+            var orig_height = bBox.height;
+
+            var bubble_width = 320;
+            var new_scale_factor = bubble_width/orig_width;
+
+            var new_width = orig_width * new_scale_factor
+            var new_height = orig_height * new_scale_factor
+
+            var width_diff = new_width - orig_width;
+            var height_diff = new_height - orig_height;
+
+            var anchor_x = -(bBox.x * (new_scale_factor - 1))/new_scale_factor;
+            var offset_x = -(width_diff)/(2 * new_scale_factor)
+
+            var anchor_y = -(bBox.y * (new_scale_factor - 1))/new_scale_factor;
+            var offset_y = -(height_diff)/(2 * new_scale_factor)
+
+            var scaling_str = 'scale(' + new_scale_factor + ', ' + new_scale_factor + ')';
+            var translate_str = 'translate(' + (anchor_x + offset_x) + ', ' + (anchor_y + offset_y) + ')';
+            return scaling_str + ' ' + translate_str;
+        });
+
     }
     function hover(datum, index) {
-        var g = d3.select(this);
-        g.append('text')
-            .attr('x', -30)
-            .attr('y', 30)
-            .attr('class', 'info')
-            .text(datum.name);
+        // var g = d3.select(this);
+        // g.append('text')
+        //     .attr('x', -30)
+        //     .attr('y', 30)
+        //     .attr('class', 'info')
+        //     .text(datum.name);
     }
     function endHover(datum, index) {
-        if (!datum && !index) {
-            fg.selectAll('text').remove();
-        } else {
-            var g = d3.select(this);
-            g.select('text').remove();
-        }
+        // if (!datum && !index) {
+        //     fg.selectAll('text').remove();
+        // } else {
+        //     var g = d3.select(this);
+        //     g.select('text').remove();
+        // }
     }
 
     window.__vis__updateGraph = initialize;

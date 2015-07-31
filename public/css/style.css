@@ -24,6 +24,9 @@ body {
     background-color: transparent;
     z-index: 2;
 }
+#fg {
+    transform-origin: 0px 0px;
+}
 
 #cover img{
     display: block;

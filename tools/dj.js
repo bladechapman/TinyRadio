@@ -33,8 +33,6 @@ function DJ(path) {
             cur_dj.selector.addNode(filename);
             console.log(filename + ' added');
         }
-
-        // console.log(new_files);
     })
 
     function filterDirectory(path) {
