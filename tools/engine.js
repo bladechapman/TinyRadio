@@ -43,8 +43,8 @@ function Selector(data, meta_path) {
     this.rateSelection = function(rating) {
         if (lastSelected && currentSelected) {
             var prev = nodes[lastSelected];
-            if (rating == 1 && prev.neighbors[currentSelected] < 15) { prev.neighbors[currentSelected] += 1;}
-            if (rating == 0 && prev.neighbors[currentSelected] >= 2)  { prev.neighbors[currentSelected] -= 1;}
+            if (rating == 1) { prev.neighbors[currentSelected] += 1;}
+            else if (rating == 0)  { prev.neighbors[currentSelected] -= 1;}
         } else {
             console.log('Okay! *continues to ignore you*');
         }
@@ -54,6 +54,12 @@ function Selector(data, meta_path) {
     }
     this.findNode = function(name) {
         return nodes[name];
+    }
+    this.getCurrentFile = function() {
+        return currentSelected;
+    }
+    this.getLastFile = function() {
+        return lastSelected;
     }
     this.addNode = function(name) {
         var newNode = new Node(name);
@@ -78,13 +84,13 @@ function Selector(data, meta_path) {
             delete nodes[node].neighbors[name];
         }
     }
-    this.selectFrom = function(origin) {
+    this.selectNext = function() {
         var file;
-        if (origin === '' || origin === undefined) {    // initially just pick a random node
+        if (currentSelected === '' || currentSelected === undefined) {    // initially just pick a random node
             file = nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
         }
         else {
-            var originNode = this.findNode(origin);
+            var originNode = this.findNode(currentSelected);
             var file = sampleWeighted(originNode.neighbors);
         }
 

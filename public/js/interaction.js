@@ -7,8 +7,9 @@ $(function() {
             data: {
                 'vote' : 1,
             },
-            success: function() { console.log('success');},
-            error: function(err) { console.log(err);}
+            success: function() {
+                window.__vis__updateGraph();
+            }
         })
 
         $('.menu_wrapper').fadeTo(50, 0, function() {
@@ -23,8 +24,9 @@ $(function() {
             data: {
                 'vote' : 0,
             },
-            success: function() { console.log('success');},
-            error: function(err) { console.log(err);}
+            success: function() {
+                window.__vis__updateGraph();
+            }
         })
         $('.menu_wrapper').fadeTo(50, 0, function() {
             $('.menu_wrapper').hide();

@@ -52,7 +52,7 @@ app.use(bodyParser.urlencoded({
         })
     });
     app.post('/vote', function(req, res) {
-        if (req.body.vote === undefined || (req.body.vote != 1 && req.body.vote != 0)) {
+        if (req.body.vote === undefined || (req.body.vote !== 1 && req.body.vote !== 0)) {
             res.json({
                 'message': '[ERROR] invalid vote value',
             })
@@ -66,12 +66,13 @@ app.use(bodyParser.urlencoded({
         res.json({
             songTimestamp: dj.startTimestamp,
             servTimestamp: Date.now(),
-            file : dj.curSong
+            file: dj.selector.getCurrentFile(),
+            prev: dj.selector.getLastFile()
         });
     });
     app.get('/song', function(req, res) {
         res.set({'Content-Type': 'audio/mpeg'});
-        var readStream = fs.createReadStream("sound/" + dj.curSong);
+        var readStream = fs.createReadStream("sound/" + dj.selector.getCurrentFile());
         readStream.pipe(res);
     });
 })();

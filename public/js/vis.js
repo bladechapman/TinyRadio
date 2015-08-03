@@ -9,6 +9,8 @@ $(function() {
         c = 10;
     var bg_color = '#ECEFF1',
         line_color = '#546E7A';
+    var node_parent,
+        line_parent;
     var nodes = [],
         links = [],
         cached_data = {};
@@ -78,6 +80,7 @@ $(function() {
             .style('fill', bg_color);
     };
     function initialize() {
+        console.log('INITIALIZE');
         force.stop();
         updateData(function(err, data) {
             if (err) {
@@ -122,6 +125,7 @@ $(function() {
             if (cached_data[node_name] && cached_data[node_name].node) {
                 new_node['x'] = cached_data[node_name].node.x;
                 new_node['y'] = cached_data[node_name].node.y;
+                new_node['color'] = cached_data[node_name].node.color
             }
             nodes.push(new_node);
             data[node_name].node = new_node;
@@ -151,6 +155,12 @@ $(function() {
     }
     function update() {
         endHover();
+
+        if (line_parent) { line_parent.remove(); }
+        if (window.__vis__previous) {
+            line_parent = fg.append('line').style('stroke', line_color).style('stroke-width', 2);
+        }
+
         node_parent.remove();
         node_parent = fg.selectAll('.circle_group')
                 .data(nodes)
@@ -165,16 +175,18 @@ $(function() {
                 .attr('class', 'node')
                 .attr('r', c)
                 .attr('fill', function(datum) {
-                    var colors = Object.keys(palette);
-                    var color_key = colors[parseInt(Math.random() * colors.length)];
-                    var color = palette[color_key];
-                    datum.color = color;
-                    return color;
+                    if (!datum.color) {
+                        var colors = Object.keys(palette);
+                        var color_key = colors[parseInt(Math.random() * colors.length)];
+                        var color = palette[color_key];
+                        datum.color = color;
+                    }
+                    return datum.color;
                 });
         node_parent
             .append('circle')
             .attr('r', function(datum) {
-                if (datum.name === window.highlighted_name) {
+                if (datum.name === window.__vis__highlighted) {
                     return c * 1.5;
                 }
                 return 0;
@@ -184,6 +196,7 @@ $(function() {
                 return datum.color || palette.blue;
             })
             .style('stroke-width', 2);
+
         force
             .nodes(nodes)
             .links(links)
@@ -193,32 +206,19 @@ $(function() {
         d3.selectAll('.circle_group').attr('transform', function(datum) {
             return 'translate(' + datum.x + ', ' + datum.y + ')';
         });
-        // d3.selectAll('.circle_group')
-            // .attr('cx', function(datum) { return datum.x; })
-            // .attr('cy', function(datum) { return datum.y; })
 
+        if (window.__vis__previous) {
+            var source = cached_data[window.__vis__previous].node;
+            var target = cached_data[window.__vis__highlighted].node;
+            fg.select('line').attr('x1', function() { return source.x });
+            fg.select('line').attr('y1', function() { return source.y });
+            fg.select('line').attr('x2', function() { return target.x });
+            fg.select('line').attr('y2', function() { return target.y });
+        }
 
-        // console.log($('#fg'));
-        // console.log($('#fg')[0].getBBox().width);
-
-        // console.log($('#fg')[0].getBoundingClientRect().width);
-        d3.select('#fg').attr('transform', function() {
+        fg.attr('transform', function() {
             var bBox = $('#fg')[0].getBBox();
             var bRect = $('#fg')[0].getBoundingClientRect();
-            var scale_regex = /scale\((\d+(?:\.\d+)?), (\d+(?:\.\d+)?)\)/
-            var transform_str = $('#fg').attr('transform');
-            var scale_vals = (transform_str) ? transform_str.match(scale_regex) : undefined;
-            var old_scale_x = 1;
-            var old_scale_y = 1;
-            if (scale_vals) {
-                old_scale_x = scale_vals[1];
-                old_scale_y = scale_vals[2];
-            };
-
-            // d3.selectAll('.test').remove();
-            // d3.select('#canvas').append('circle').attr('r', 3).attr('cx', bBox.x).attr('cy', bBox.y).style('stroke', '#000000').style('stroke-width', 1).style('fill', '#000000').attr('class', 'test');
-            // d3.select('#canvas').append('circle').attr('r', 3).attr('cx', 0).attr('cy', 0).style('stroke', palette.purple).style('stroke-width', 1).style('fill', palette.purple).attr('class', 'test');
-            // console.log(bBox);
 
             var orig_width = bBox.width;
             var orig_height = bBox.height;
@@ -245,20 +245,10 @@ $(function() {
 
     }
     function hover(datum, index) {
-        // var g = d3.select(this);
-        // g.append('text')
-        //     .attr('x', -30)
-        //     .attr('y', 30)
-        //     .attr('class', 'info')
-        //     .text(datum.name);
+        $('#tip').html(datum.name);
     }
     function endHover(datum, index) {
-        // if (!datum && !index) {
-        //     fg.selectAll('text').remove();
-        // } else {
-        //     var g = d3.select(this);
-        //     g.select('text').remove();
-        // }
+        $('#tip').html('');
     }
 
     window.__vis__updateGraph = initialize;

@@ -14,7 +14,6 @@ function DJ(path) {
     };
     this.path = path;
     this.startTimestamp = 0;
-    this.curSong;
     this.events = {}    // name, callbacks
     this.selector = new Selector(filterDirectory(this.path));
 
@@ -78,7 +77,7 @@ function DJ(path) {
         fs.readdir(cur_dj.path, function(err, files) {
             // for now, just return random
             // eventually convert this into an LRU cache
-            var file = cur_dj.selector.selectFrom(cur_dj.curSong);
+            var file = cur_dj.selector.selectNext();
 
             try {
                 findDuration(cur_dj.path + filepathConvert.convertTo(file), function(duration) {
@@ -91,14 +90,14 @@ function DJ(path) {
                     }, duration + songBuffer);
 
                     cur_dj.startTimestamp = Date.now();
-                    cur_dj.curSong = file;
                     cur_dj.dispatchEvent('next_song');
 
-                    callback(cur_dj.curSong);
+                    callback(file);
                 })
             }
             catch(err) {
                 console.log('[ERROR] Cannot read file ' + file + ', trying again');
+                cur_dj.curSelector.removeNode(file);
                 cur_dj.startNextTrack(function() {});
             }
         })
