@@ -223,8 +223,9 @@ $(function() {
             var orig_width = bBox.width;
             var orig_height = bBox.height;
 
-            var bubble_width = 320;
-            var new_scale_factor = bubble_width/orig_width;
+            var bubble_width = 320/1.414;
+
+            var new_scale_factor = (orig_width > orig_height) ? bubble_width/orig_width : bubble_width/orig_height;
 
             var new_width = orig_width * new_scale_factor
             var new_height = orig_height * new_scale_factor
