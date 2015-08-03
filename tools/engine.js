@@ -43,8 +43,12 @@ function Selector(data, meta_path) {
     this.rateSelection = function(rating) {
         if (lastSelected && currentSelected) {
             var prev = nodes[lastSelected];
-            if (rating == 1) { prev.neighbors[currentSelected] += 1;}
-            else if (rating == 0)  { prev.neighbors[currentSelected] -= 1;}
+            if (rating === 1) {
+                prev.neighbors[currentSelected] += 10;
+            }
+            else if (rating === 0)  {
+                prev.neighbors[currentSelected] -= 10;
+            }
         } else {
             console.log('Okay! *continues to ignore you*');
         }

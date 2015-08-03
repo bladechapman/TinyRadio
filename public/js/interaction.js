@@ -8,7 +8,11 @@ $(function() {
                 'vote' : 1,
             },
             success: function() {
+                console.log('Success');
                 window.__vis__updateGraph();
+            },
+            error: function(err) {
+                console.log(err)
             }
         })
 
@@ -25,7 +29,11 @@ $(function() {
                 'vote' : 0,
             },
             success: function() {
+                console.log('success');
                 window.__vis__updateGraph();
+            },
+            error: function(err) {
+                console.log(err)
             }
         })
         $('.menu_wrapper').fadeTo(50, 0, function() {

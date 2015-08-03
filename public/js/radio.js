@@ -7,7 +7,7 @@ $(function() {
     var serverOffset; // server timestamp
     var serv_mutex = false;
 
-    setInterval(loadSound, 120000);
+    setInterval(loadSound, 60000);
 
     $('.mobile_activate').click(function() {
         oscillator = context.createOscillator();

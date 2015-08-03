@@ -52,14 +52,14 @@ app.use(bodyParser.urlencoded({
         })
     });
     app.post('/vote', function(req, res) {
-        if (req.body.vote === undefined || (req.body.vote !== 1 && req.body.vote !== 0)) {
-            res.json({
+        if (req.body.vote === undefined || (req.body.vote !== '1' && req.body.vote !== '0')) {
+            res.status(400).json({
                 'message': '[ERROR] invalid vote value',
             })
             return;
         }
 
-        dj.selector.rateSelection(req.body.vote);
+        dj.selector.rateSelection(parseInt(req.body.vote));
         res.json({'message' : '[SUCCESS]'})
     });
     app.get('/info', function(req, res) {
