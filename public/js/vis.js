@@ -248,7 +248,7 @@ $(function() {
 
     }
     function hover(datum, index) {
-        $('#tip').html(datum.name);
+        $('#tip').html(window.filter_filename(datum.name));
     }
     function endHover(datum, index) {
         $('#tip').html('');

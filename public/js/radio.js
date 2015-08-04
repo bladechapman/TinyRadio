@@ -48,9 +48,19 @@ $(function() {
         }
     }
 
-    function filter_filename(file) {
-        var arr = file.split('.');
-        return arr.slice(0, arr.length - 1).join(' ');
+    window.filter_filename = function filter_filename(file) {
+        var ext_arr = file.split('.');
+        var ext = ext_arr.slice(0, ext_arr.length - 1).join();
+        var path_arr = ext.split('/');
+        var file = path_arr.slice(path_arr.length -1, path_arr.length).join();
+
+        file = file.replace(/\\\s/g, ' ');
+        file = file.replace(/\\\(/g, '(');
+        file = file.replace(/\\\)/g, ')');
+        file = file.replace(/\\\&/g, '&');
+        file = file.replace(/\\\'/g, '\'');
+
+        return file;
     }
     function process(data, info) {
         window.__vis__highlighted = info.file;
