@@ -1,16 +1,19 @@
 var fs = require('fs');
 var childProcess = require('child_process');
-var Selector = require('./engine');
+var recursiveReaddirSync = require('recursive-readdir-sync');
+var chok = require('chokidar');
 var filepathConvert = require('./filepath-convert');
+var Selector = require('./engine');
 
 function DJ(path) {
     var cur_dj = this;
     var timout;
     var songBuffer = 3000;
     var type_whitelist = {
-        'mp4' : true,
-        'mp3' : true,
-        'wav' : true
+        'mp4': true,
+        'm4a': true,
+        'mp3': true,
+        'wav': true
     };
     this.path = path;
     this.startTimestamp = 0;
@@ -19,20 +22,34 @@ function DJ(path) {
 
     this.registerEvent('next_song');
 
-    fs.watch(path, {
-        'persistent' : false
-    }, function(event, filename) {
-        var new_files = filterDirectory(path);
-        var nodes = cur_dj.selector.getNodes();
+    watcher = chok.watch(path, {
+        'persistent': true,
+        'usePolling': false
+    });
 
-        if (new_files.length < Object.keys(nodes).length) {
-            cur_dj.selector.removeNode(filename);
-            console.log(filename + ' removed');
-        } else if (new_files.length > Object.keys(nodes).length) {
-            cur_dj.selector.addNode(filename);
-            console.log(filename + ' added');
-        }
-    })
+    watcher.on('ready', function(event, path) {
+        watcher.on('all', function(event, path) {;
+            if (event === 'unlink') {
+                cur_dj.selector.removeNode(filepathConvert.convertTo(path));
+            }
+            else if (event === 'add') {
+                cur_dj.selector.addNode(filepathConvert.convertTo(path));
+            }
+            else if (event === 'addDir') {
+                files = recursiveReaddirSync(path);
+                files.forEach(function(element) {
+                    cur_dj.selector.addNode(element);
+                });
+            }
+        });
+    });
+    watcher.on('error', function(error) {
+        console.log('Error watching files');
+        console.log(err);
+        console.log('exiting gracefully');
+        cur_dj.selector.saveMetadata();
+        process.exit();
+    });
 
     function filterDirectory(path) {
         var files = [];
@@ -40,7 +57,7 @@ function DJ(path) {
 
         try {
             var stats = fs.lstatSync(path);
-            if (stats.isDirectory()) { files = fs.readdirSync(path); }
+            if (stats.isDirectory()) { files = recursiveReaddirSync(path); }
             else { except(); }
         }
         catch (err) { except(); }
@@ -53,13 +70,15 @@ function DJ(path) {
 
         if (files.length === 0) { except(); }
         files.forEach(function(element) {
-            var converted_path = path + element;
             var path_components = element.split('.');
-            if(fs.lstatSync(converted_path).isFile() && path_components[path_components.length - 1] in type_whitelist) { ret.push(element); }
+            if(fs.lstatSync(element).isFile() && path_components[path_components.length - 1] in type_whitelist) {
+                ret.push(filepathConvert.convertTo(element));
+            }
         });
         return ret;
     }
     function findDuration(path, callback) {
+        console.log(path);
         childProcess.exec('ffmpeg -i ' + path, function(error, stdout, stderr) {
             var dur_string = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
             var dur_string_arr = dur_string.split('.')[0].split(':');
@@ -74,33 +93,31 @@ function DJ(path) {
 
     this.startNextTrack = function(callback) {
         callback = callback || function() {};
-        fs.readdir(cur_dj.path, function(err, files) {
-            // for now, just return random
-            // eventually convert this into an LRU cache
-            var file = cur_dj.selector.selectNext();
+        // for now, just return random
+        // eventually convert this into an LRU cache
+        var file = cur_dj.selector.selectNext();
 
-            try {
-                findDuration(cur_dj.path + filepathConvert.convertTo(file), function(duration) {
-                    // duration needs to be adjusted to playback speed of Audio API player
-                    console.log('Selected file: ' + file);
+        try {
+            findDuration(file, function(duration) {
+                // duration needs to be adjusted to playback speed of Audio API player
+                console.log('Selected file: ' + file);
 
-                    clearTimeout(timout);
-                    timout = setTimeout(function() {
-                        cur_dj.startNextTrack(function() {});
-                    }, duration + songBuffer);
+                clearTimeout(timout);
+                timout = setTimeout(function() {
+                    cur_dj.startNextTrack(function() {});
+                }, duration + songBuffer);
 
-                    cur_dj.startTimestamp = Date.now();
-                    cur_dj.dispatchEvent('next_song');
+                cur_dj.startTimestamp = Date.now();
+                cur_dj.dispatchEvent('next_song');
 
-                    callback(file);
-                })
-            }
-            catch(err) {
-                console.log('[ERROR] Cannot read file ' + file + ', trying again');
-                cur_dj.curSelector.removeNode(file);
-                cur_dj.startNextTrack(function() {});
-            }
-        })
+                callback(file);
+            })
+        }
+        catch(err) {
+            console.log('[ERROR] Cannot read file ' + file + ', trying again');
+            cur_dj.curSelector.removeNode(file);
+            cur_dj.startNextTrack(function() {});
+        }
     }
 }
 DJ.prototype.registerEvent = function(eventName) {

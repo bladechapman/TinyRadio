@@ -28,9 +28,9 @@ $(function() {
     function drawBG() {
         force = d3.layout.force()
             .charge(-.0000001)
-            .gravity(0.2)
+            .gravity(.2)
             .linkDistance(function(datum) {
-                return parseInt(400/datum.weight);
+                return parseInt(2000/datum.weight);
             })
             .size([w, h])
             .on("tick", tick);
@@ -80,7 +80,6 @@ $(function() {
             .style('fill', bg_color);
     };
     function initialize() {
-        console.log('INITIALIZE');
         force.stop();
         updateData(function(err, data) {
             if (err) {
@@ -200,6 +199,9 @@ $(function() {
         force
             .nodes(nodes)
             .links(links)
+            .linkDistance(function(datum) {
+                return parseInt((40 * Object.keys(cached_data).length)/datum.weight);
+            })
             .start();
     }
     function tick() {
