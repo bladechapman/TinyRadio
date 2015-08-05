@@ -9,7 +9,6 @@ $(function() {
             },
             success: function() {
                 console.log('Success');
-                window.__vis__updateGraph();
             },
             error: function(err) {
                 console.log(err)
@@ -30,7 +29,6 @@ $(function() {
             },
             success: function() {
                 console.log('success');
-                window.__vis__updateGraph();
             },
             error: function(err) {
                 console.log(err)

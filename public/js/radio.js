@@ -82,7 +82,7 @@ $(function() {
 
             var elapsedTime = (requestTime + songTime) / 1000;
 
-            console.log('ntp offset: ' + ntp.offset());
+            // console.log('ntp offset: ' + ntp.offset());
 
             temp_source.start(context.currentTime, elapsedTime);
 
