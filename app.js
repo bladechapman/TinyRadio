@@ -3,7 +3,6 @@ var path = require('path');
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var DJ = require('./tools/dj');
-var filepathConvert = require('./tools/filepath-convert');
 
 var app = express();
 var http = require('http').Server(app);
@@ -67,7 +66,7 @@ app.use(bodyParser.urlencoded({
     });
     app.get('/song', function(req, res) {
         res.set({'Content-Type': 'audio/mpeg'});
-        var readStream = fs.createReadStream(filepathConvert.convertFrom(dj.selector.getCurrentFile()));
+        var readStream = fs.createReadStream(dj.selector.getCurrentFile());
         readStream.pipe(res);
     });
 })();

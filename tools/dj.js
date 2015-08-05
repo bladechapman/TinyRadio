@@ -2,7 +2,6 @@ var fs = require('fs');
 var childProcess = require('child_process');
 var recursiveReaddirSync = require('recursive-readdir-sync');
 var chok = require('chokidar');
-var filepathConvert = require('./filepath-convert');
 var Selector = require('./engine');
 
 function DJ(path) {
@@ -30,10 +29,12 @@ function DJ(path) {
     watcher.on('ready', function(event, path) {
         watcher.on('all', function(event, path) {;
             if (event === 'unlink') {
-                cur_dj.selector.removeNode(filepathConvert.convertTo(path));
+                cur_dj.selector.removeNode(path);
+                console.log(cur_dj.selector.getNodes());
             }
             else if (event === 'add') {
-                cur_dj.selector.addNode(filepathConvert.convertTo(path));
+                cur_dj.selector.addNode(path);
+                console.log(cur_dj.selector.getNodes());
             }
             else if (event === 'addDir') {
                 files = recursiveReaddirSync(path);
@@ -72,14 +73,14 @@ function DJ(path) {
         files.forEach(function(element) {
             var path_components = element.split('.');
             if(fs.lstatSync(element).isFile() && path_components[path_components.length - 1] in type_whitelist) {
-                ret.push(filepathConvert.convertTo(element));
+                ret.push(element);
             }
         });
         return ret;
     }
     function findDuration(path, callback) {
         console.log(path);
-        childProcess.exec('ffmpeg -i ' + path, function(error, stdout, stderr) {
+        childProcess.exec('ffmpeg -i \"' + path + "\"", function(error, stdout, stderr) {
             var dur_string = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
             var dur_string_arr = dur_string.split('.')[0].split(':');
             dur_string_arr.push(dur_string.split('.')[1].substring(0, 2));
