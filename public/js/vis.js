@@ -26,15 +26,6 @@ $(function() {
     drawBG();
     initialize();
     function drawBG() {
-        force = d3.layout.force()
-            .charge(-.0000001)
-            .gravity(.2)
-            .linkDistance(function(datum) {
-                return parseInt(2000/datum.weight);
-            })
-            .size([w, h])
-            .on("tick", tick);
-
         chart_window = d3.select('#chart')
             .append('svg')
             .attr("viewBox", "0 0 500 500")
@@ -80,6 +71,15 @@ $(function() {
             .style('fill', bg_color);
     };
     function initialize() {
+        force = d3.layout.force()
+            .charge(-1)
+            .gravity(0.1)
+            .linkDistance(function(datum) {
+                return parseInt(2000/datum.weight);
+            })
+            .size([w, h])
+            .on("tick", tick);
+
         force.stop();
         updateData(function(err, data) {
             if (err) {
@@ -98,11 +98,20 @@ $(function() {
 
         dataReq.send();
         dataReq.onreadystatechange = function() {
-            if (dataReq.readyState == 4 && dataReq.status == 200) {
+            if (dataReq.readyState === 4 && dataReq.status === 200) {
+
                 var data = dataReq.response.data;
-                callback(null, data);
+                if (Object.keys(data).length > 3000) {
+                    $('#tip').html('Too many songs to display');
+                    callback({
+                        'message' : 'Too many songs'
+                    }, null);
+                }
+                else {
+                    callback(null, data);
+                }
             }
-            else if (dataReq.readyState == "complete" && dataReq.status != 200) {
+            else if (dataReq.readyState === "complete" && dataReq.status !== 200) {
                 callback({
                     'message' : 'Error retrieving node data'
                 }, null);
@@ -117,6 +126,8 @@ $(function() {
     function flatten_data(data) {
         build_nodes(data);
         build_links(data);
+
+        cached_data = data;
     }
     function build_nodes(data) {
         for (var node_name in data) {
@@ -129,7 +140,6 @@ $(function() {
             nodes.push(new_node);
             data[node_name].node = new_node;
         }
-        cached_data = data;
     }
     function build_links(data) {
         for (var cur_name in data) {
@@ -205,10 +215,9 @@ $(function() {
             .start();
     }
     function tick() {
-        d3.selectAll('.circle_group').attr('transform', function(datum) {
+        fg.selectAll('.circle_group').attr('transform', function(datum) {
             return 'translate(' + datum.x + ', ' + datum.y + ')';
         });
-
         if (window.__vis__previous) {
             var source = cached_data[window.__vis__previous].node;
             var target = cached_data[window.__vis__highlighted].node;
@@ -217,10 +226,8 @@ $(function() {
             fg.select('line').attr('x2', function() { return target.x });
             fg.select('line').attr('y2', function() { return target.y });
         }
-
         fg.attr('transform', function() {
             var bBox = $('#fg')[0].getBBox();
-            var bRect = $('#fg')[0].getBoundingClientRect();
 
             var orig_width = bBox.width;
             var orig_height = bBox.height;
