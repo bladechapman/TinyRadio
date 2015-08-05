@@ -46,12 +46,6 @@ app.use(bodyParser.urlencoded({
             'data': dj.selector.getNodes()
         });
     });
-    app.get('/skip', function(req, res) {
-        dj.startNextTrack()
-        res.json({
-            'message': '[SUCCESS]'
-        })
-    });
     app.post('/vote', function(req, res) {
         if (req.body.vote === undefined || (req.body.vote !== '1' && req.body.vote !== '0')) {
             res.status(400).json({
