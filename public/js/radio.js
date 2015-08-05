@@ -25,7 +25,7 @@ $(function() {
         buffer: 30
     });
     socket.on('app:next_song', function() {
-        loadSound();
+        loadSound(true);
 
         $('#cover').fadeTo(100, 0, function() {
             $('#cover').hide();
@@ -62,10 +62,12 @@ $(function() {
 
         return file;
     }
-    function process(data, info) {
-        window.__vis__highlighted = info.file;
-        window.__vis__previous = info.prev;
-        window.__vis__updateGraph();
+    function process(data, info, refresh_vis) {
+        if (refresh_vis) {
+            window.__vis__highlighted = info.file;
+            window.__vis__previous = info.prev;
+            window.__vis__updateGraph();
+        }
         $('.songname').html(filter_filename(info.file));
         $('.songname').fadeTo(50, 1);
 
@@ -86,11 +88,10 @@ $(function() {
 
             if (source) { source.stop(0);}
             source = temp_source;
-            // source.start(context.currentTime, elapsedTime);
         })
     }
 
-    function loadSound() {
+    function loadSound(refresh_vis) {
         if (serv_mutex) { return; }
         serv_mutex = true;
 
@@ -110,7 +111,7 @@ $(function() {
         var data;
         var info;
         var asyncNetwork = async(2, function() {
-            process(data, infoReq.response);
+            process(data, infoReq.response, refresh_vis);
             serv_mutex = false;
         })
 
