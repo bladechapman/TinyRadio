@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var DJ = require('./tools/dj');
 
 var app = express();
+var os = require('os');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var ntp = require('./tools/ntp-server');
@@ -71,14 +72,28 @@ app.use(bodyParser.urlencoded({
     });
 })();
 
+process.on('SIGTERM', gracefulExit);
+process.on('SIGINT', gracefulExit);
 function gracefulExit() {
     console.log('exiting gracefully');
     dj.selector.saveMetadata();
     process.exit();
 }
-process.on('SIGTERM', gracefulExit);
-process.on('SIGINT', gracefulExit);
 
-http.listen(8000, function() {
-    console.log('listening on port 8000');
+var interfaces = os.networkInterfaces();
+var addresses = [];
+for (var i in interfaces) {
+    for (var j in interfaces[i]) {
+        var address = interfaces[i][j];
+        if (address.family === 'IPv4' && !address.internal) {
+            addresses.push(address.address);
+        }
+    }
+}
+
+var port = process.env.PORT || 8000;
+var hostname = addresses[0];
+
+http.listen(port, hostname, function() {
+    console.log('listening at IP: ' + hostname + ' on port ' + port);
 });
