@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var DJ = require('./tools/dj');
 
 var app = express();
+var apps = require('polo')();
 var os = require('os');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -93,6 +94,17 @@ for (var i in interfaces) {
 
 var port = process.env.PORT || 8000;
 var hostname = addresses[0];
+
+apps.put({
+    'name': 'tiny-radio',
+    'port': port
+});
+apps.once('up', function(name, service) {
+    console.log('---POLO---');
+    console.log(name);
+    console.log(service);
+})
+
 
 http.listen(port, hostname, function() {
     console.log('listening at IP: ' + hostname + ' on port ' + port);
