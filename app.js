@@ -99,12 +99,11 @@ apps.put({
     'name': 'tiny-radio',
     'port': port
 });
-apps.once('up', function(name, service) {
+apps.on('up', function(name, service) {
     console.log('---POLO---');
     console.log(name);
     console.log(service);
-})
-
+});
 
 http.listen(port, hostname, function() {
     console.log('listening at IP: ' + hostname + ' on port ' + port);
