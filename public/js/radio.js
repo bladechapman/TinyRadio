@@ -35,6 +35,14 @@ $(function() {
 
         $('.songname').fadeTo(50, 0);
     })
+    socket.on('new_service', function(d) {
+        console.log('new service');
+        console.log(d);
+    });
+    socket.on('service_removed', function(d) {
+        console.log('service removed');
+        console.log(d);
+    })
 
     function async(limit, async_finally) {
         var internalCounter = 0;

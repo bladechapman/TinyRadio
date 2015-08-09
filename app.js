@@ -77,6 +77,7 @@ process.on('SIGTERM', gracefulExit);
 process.on('SIGINT', gracefulExit);
 function gracefulExit() {
     console.log('exiting gracefully');
+    apps.stop();
     dj.selector.saveMetadata();
     process.exit();
 }
@@ -97,13 +98,19 @@ var hostname = addresses[0];
 
 apps.put({
     'name': 'tiny-radio',
-    'port': port
+    'port': port,
+    'heartbeat': 1000
 });
 apps.on('up', function(name, service) {
-    console.log('---POLO---');
-    console.log(name);
+    console.log('UP');
     console.log(service);
+    io.emit('new_service', service.address);
 });
+apps.on('down', function(name, service) {
+    console.log('DOWN');
+    console.log(service);
+    io.emit('service_removed', service.address)
+})
 
 http.listen(port, hostname, function() {
     console.log('listening at IP: ' + hostname + ' on port ' + port);
