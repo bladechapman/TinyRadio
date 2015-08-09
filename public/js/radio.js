@@ -35,14 +35,13 @@ $(function() {
 
         $('.songname').fadeTo(50, 0);
     })
-    socket.on('new_service', function(d) {
-        console.log('new service');
-        console.log(d);
+    socket.on('stations_changed', function(new_stations) {
+        console.log(new_stations);
+        $('#list').html('');
+        new_stations.forEach(function(station_info) {
+            $('#list').append("<a href=http://" + station_info.address + ">" + station_info.address +"</a>")
+        })
     });
-    socket.on('service_removed', function(d) {
-        console.log('service removed');
-        console.log(d);
-    })
 
     function async(limit, async_finally) {
         var internalCounter = 0;

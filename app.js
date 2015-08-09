@@ -36,6 +36,7 @@ app.use(bodyParser.urlencoded({
 (function initEndpoints() {
     io.on('connection', function(socket) {
         ntp.sync(socket);
+        socket.emit('stations_changed', apps.all('tiny-radio'));
         setTimeout(function() {
             socket.emit('app:next_song');
         }, 3000);
@@ -100,17 +101,12 @@ apps.put({
     'name': 'tiny-radio',
     'port': port,
 });
-apps.on('up', function(name, service) {
-    console.log('UP');
-    console.log(apps.all('tiny-radio'));
-    io.emit('new_service', service.address);
+apps.on('up', function() {
+    io.emit('stations_changed', apps.all('tiny-radio'));
 });
-apps.on('down', function(name, service) {
-    console.log('DOWN');
-    console.log(apps.all('tiny-radio'));
-    io.emit('service_removed', service.address);
+apps.on('down', function() {
+    io.emit('stations_changed', apps.all('tiny-radio'));
 })
-
 http.listen(port, hostname, function() {
     console.log('listening at IP: ' + hostname + ' on port ' + port);
 });
