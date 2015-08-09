@@ -99,17 +99,16 @@ var hostname = addresses[0];
 apps.put({
     'name': 'tiny-radio',
     'port': port,
-    'heartbeat': 1000
 });
 apps.on('up', function(name, service) {
     console.log('UP');
-    console.log(service);
+    console.log(apps.all('tiny-radio'));
     io.emit('new_service', service.address);
 });
 apps.on('down', function(name, service) {
     console.log('DOWN');
-    console.log(service);
-    io.emit('service_removed', service.address)
+    console.log(apps.all('tiny-radio'));
+    io.emit('service_removed', service.address);
 })
 
 http.listen(port, hostname, function() {
