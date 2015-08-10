@@ -48,6 +48,24 @@ app.use(bodyParser.urlencoded({
             'data': dj.selector.getNodes()
         });
     });
+    app.get('/skip', function(req, res) {
+        dj.startNextTrack()
+        res.json({
+            'message': '[SUCCESS]'
+        })
+    });
+    app.post('/enqueue', function(req, res) {
+        var status = dj.selector.addToQueue(req.body.name);
+        if (status === 1) {
+            res.json({'message': '[SUCCESS]'});
+        }
+        else if (status === -1) {
+            res.json({'message': '[ERROR] - Cannot add' +  + 'song to queue'});
+        }
+        else {
+            res.json({'message': '[ERROR] - The same song cannot be added twice in a row'});
+        }
+    });
     app.post('/vote', function(req, res) {
         if (req.body.vote === undefined || (req.body.vote !== '1' && req.body.vote !== '0')) {
             res.status(400).json({
@@ -57,7 +75,7 @@ app.use(bodyParser.urlencoded({
         }
 
         dj.selector.rateSelection(parseInt(req.body.vote));
-        res.json({'message' : '[SUCCESS]'})
+        res.json({'message' : '[SUCCESS]'});
     });
     app.get('/info', function(req, res) {
         res.json({

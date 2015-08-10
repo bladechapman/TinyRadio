@@ -9,6 +9,7 @@ function Node(name) {
 function Selector(data, meta_path) {
     var curSelector = this;
     var nodes = {};
+    var queue = [];     // note, implementation is lazy - poor performance for large sets
     var lastSelected = undefined;
     var currentSelected = undefined;
     var initial_ranking = 5;
@@ -39,27 +40,17 @@ function Selector(data, meta_path) {
             }
         }
     }
-
-    this.rateSelection = function(rating) {
-        if (lastSelected && currentSelected) {
-            var prev = nodes[lastSelected];
-            if (rating === 1) { prev.neighbors[currentSelected] += 1; }
-            else if (rating === 0 && prev.neighbors[currentSelected] >= 2)  { prev.neighbors[currentSelected] -= 1; }
-        } else {
-            console.log('Okay! *continues to ignore you*');
-        }
-    }
-    this.getNodes = function() {
-        return nodes;
-    }
-    this.findNode = function(name) {
-        return nodes[name];
-    }
     this.getCurrentFile = function() {
         return currentSelected;
     }
     this.getLastFile = function() {
         return lastSelected;
+    }
+    this.getNodes = function() {
+        return nodes;
+    }
+    this.findNode = function (name) {
+        return nodes[name];
     }
     this.addNode = function(name) {
         var newNode = new Node(name);
@@ -84,6 +75,21 @@ function Selector(data, meta_path) {
             delete nodes[node].neighbors[name];
         }
     }
+    this.addToQueue = function(name) {
+        if (!(name in nodes)) { return -1; }
+        if (queue[0] && queue[0].name === name) { return 0; }
+        queue[queue.length] = nodes[name];
+        console.log(queue);
+        return 1;
+    }
+    this.removeFromQueue = function() {
+        var ret = queue.shift();
+        console.log(queue);
+        return ret;
+    }
+    this.peekInQueue = function() {
+        return queue[0];
+    }
     this.selectNext = function() {
         var file;
         if (currentSelected === '' || currentSelected === undefined) {    // initially just pick a random node
@@ -98,6 +104,15 @@ function Selector(data, meta_path) {
         currentSelected = file;
 
         return file;
+    }
+    this.rateSelection = function(rating) {
+        if (lastSelected && currentSelected) {
+            var prev = nodes[lastSelected];
+            if (rating === 1) { prev.neighbors[currentSelected] += 1; }
+            else if (rating === 0 && prev.neighbors[currentSelected] >= 2)  { prev.neighbors[currentSelected] -= 1; }
+        } else {
+            console.log('Okay! *continues to ignore you*');
+        }
     }
     this.saveMetadata = function() {
         fs.writeFileSync(meta_path + 'sound_meta.json', JSON.stringify(nodes));

@@ -25,7 +25,6 @@ function DJ(path) {
         'persistent': true,
         'usePolling': false
     });
-
     watcher.on('ready', function(event, path) {
         watcher.on('all', function(event, path) {;
             if (event === 'unlink') {
