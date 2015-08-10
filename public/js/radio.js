@@ -39,7 +39,7 @@ $(function() {
         console.log(new_stations);
         $('#list').html('');
         new_stations.forEach(function(station_info) {
-            $('#list').append("<a href=http://" + station_info.address + ">" + station_info.address +"</a>")
+            $('#list').append("<div><a href=http://" + station_info.address + ">" + station_info.address +"</a></div>");
         })
     });
 
