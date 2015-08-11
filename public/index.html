@@ -12,27 +12,57 @@
         <script type="text/javascript" src="./js/interaction.js"></script>
 
 
+        <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="./css/style.css">
-        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 
     </head>
 
-    <div id="cover">
+    <!-- <div id="cover">
         <img class="cover_image" src="./assets/boombox.png" />
         <div class="cover_text">Tuning your radio...</div>
-    </div>
+    </div> -->
 
-    <div class='mobile_activate'>Mobile? Out of sync? Click here</div>
+    <!-- <div class='mobile_activate'>Mobile? Out of sync? Click here</div> -->
 
-    <body>
-        <div id="title">Stations near you</div>
+    <header>
+        <div class="primary">TinyRadio</div>
+        <div class="secondary">Station 10.0.1.44:8000</div>
+    </header>
+
+    <section>
+        <input class="search" type="text" placeholder="Queue a song"></input>
+        <!-- <button>test_animations</button> -->
+        <div id="list_container">
+            <div class="gradient"></div>
+            <div class="list">
+                <div class="tr one songname"></div>
+                <div class="tr two">A</div>
+                <div class="tr three">B</div>
+                <div class="tr four">C</div>
+                <div class="tr five">D</div>
+            </div>
+        </div>
+        <!-- <div id="title">Stations near you</div>
         <div id="list"></div>
         <div id="chart"></div>
-        <div id="tip"></div>
-    </body>
+        <div id="tip"></div> -->
+    </section>
 
-    <div class="menu_wrapper position_right">
+    <!--
+    <script>
+        $('button').click(function() {
+            console.log('CLICK');
+            $('.two').toggleClass('two').toggleClass('one');
+            // $('.two').toggleClass('animate_two');
+            // $('.three').toggleClass('animate_three');
+            // $('.four').toggleClass('animate_four');
+            // $('.five').toggleClass('animate_five');
+        })
+    </script>
+    -->
+
+    <!-- <div class="menu_wrapper position_right">
         <div class="up_button material_button">
             <i class="fa fa-angle-up"></i>
         </div>
@@ -41,16 +71,18 @@
         <div class="down_button material_button">
             <i class="fa fa-angle-down"></i>
         </div>
-    </div>
+    </div> -->
 
     <footer>
-        <img class="footer_image" src="./assets/radio.png" />
+        <!-- <img class="footer_image" src="./assets/radio.png" />
         <div class="info">
             <div class="song_header">You're listening to...</div>
             <div class="songname"></div>
-        </div>
+        </div> -->
     </footer>
+
 
     <script type="text/javascript" src="./lib/d3/d3.min.js"></script>
     <script type="text/javascript" src="./js/vis.js"></script>
+
 </html>

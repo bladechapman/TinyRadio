@@ -33,7 +33,6 @@ $(function() {
         $('.menu_wrapper').show();
         $('.menu_wrapper').fadeTo(50, 1);
 
-        $('.songname').fadeTo(50, 0);
     })
     socket.on('stations_changed', function(new_stations) {
         console.log(new_stations);
@@ -76,7 +75,6 @@ $(function() {
             window.__vis__updateGraph();
         }
         $('.songname').html(filter_filename(info.file));
-        $('.songname').fadeTo(50, 1);
 
         var temp_source = context.createBufferSource()
         context.decodeAudioData(data, function(decoded) {
