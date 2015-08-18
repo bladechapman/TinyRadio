@@ -25,21 +25,21 @@ $(function() {
         buffer: 30
     });
     socket.on('app:next_song', function() {
-        loadSound(true);
-
-        $('#cover').fadeTo(100, 0, function() {
-            $('#cover').hide();
-        });
-        $('.menu_wrapper').show();
-        $('.menu_wrapper').fadeTo(50, 1);
-
+        loadSound();
     })
     socket.on('stations_changed', function(new_stations) {
         console.log(new_stations);
-        $('#list').html('');
         new_stations.forEach(function(station_info) {
-            $('#list').append("<div><a href=http://" + station_info.address + ">" + station_info.address +"</a></div>");
-        })
+            console.log(station_info);
+        });
+    });
+    socket.on('queue:resp', function(queued_songs) {
+        console.log('RECEIVED QUEUE');
+        console.log(queued_songs);
+        $('.two').html(filter_filename(queued_songs[0] || ''));
+        $('.three').html(filter_filename(queued_songs[1] || ''))
+        $('.four').html(filter_filename(queued_songs[2] || ''));
+        $('.five').html(filter_filename(queued_songs[3] || ''))
     });
 
     function async(limit, async_finally) {
@@ -53,7 +53,6 @@ $(function() {
             }
         }
     }
-
     window.filter_filename = function filter_filename(file) {
         var ext_arr = file.split('.');
         var ext = ext_arr.slice(0, ext_arr.length - 1).join();
@@ -68,12 +67,7 @@ $(function() {
 
         return file;
     }
-    function process(data, info, refresh_vis) {
-        if (refresh_vis) {
-            window.__vis__highlighted = info.file;
-            window.__vis__previous = info.prev;
-            window.__vis__updateGraph();
-        }
+    function process(data, info) {
         $('.songname').html(filter_filename(info.file));
 
         var temp_source = context.createBufferSource()
@@ -87,7 +81,7 @@ $(function() {
 
             var elapsedTime = (requestTime + songTime) / 1000;
 
-            // console.log('ntp offset: ' + ntp.offset());
+            console.log('ntp offset: ' + ntp.offset());
 
             temp_source.start(context.currentTime, elapsedTime);
 
@@ -95,8 +89,7 @@ $(function() {
             source = temp_source;
         })
     }
-
-    function loadSound(refresh_vis) {
+    function loadSound() {
         if (serv_mutex) { return; }
         serv_mutex = true;
 
@@ -116,7 +109,7 @@ $(function() {
         var data;
         var info;
         var asyncNetwork = async(2, function() {
-            process(data, infoReq.response, refresh_vis);
+            process(data, infoReq.response);
             serv_mutex = false;
         })
 

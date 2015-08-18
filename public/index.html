@@ -11,7 +11,6 @@
         <script type="text/javascript" src="./js/radio.js"></script>
         <script type="text/javascript" src="./js/interaction.js"></script>
 
-
         <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="./css/style.css">
@@ -25,22 +24,24 @@
 
     <!-- <div class='mobile_activate'>Mobile? Out of sync? Click here</div> -->
 
-    <header>
-        <div class="primary">TinyRadio</div>
-        <div class="secondary">Station 10.0.1.44:8000</div>
-    </header>
+    <div class="header">
+        <div class="primary mobile_activate">TinyRadio</div>
+        <div class="secondary">Station *TEST*</div>
+    </div>
 
     <section>
-        <input class="search" type="text" placeholder="Queue a song"></input>
+        <input id="search" type="text" placeholder="Queue a song"></input>
+        <div class="list">
+        </div>
         <!-- <button>test_animations</button> -->
-        <div id="list_container">
+        <div id="queue_container">
             <div class="gradient"></div>
-            <div class="list">
+            <div class="queue">
                 <div class="tr one songname"></div>
-                <div class="tr two">A</div>
-                <div class="tr three">B</div>
-                <div class="tr four">C</div>
-                <div class="tr five">D</div>
+                <div class="tr two"></div>
+                <div class="tr three"></div>
+                <div class="tr four"></div>
+                <div class="tr five"></div>
             </div>
         </div>
         <!-- <div id="title">Stations near you</div>
@@ -80,9 +81,5 @@
             <div class="songname"></div>
         </div> -->
     </footer>
-
-
-    <script type="text/javascript" src="./lib/d3/d3.min.js"></script>
-    <script type="text/javascript" src="./js/vis.js"></script>
 
 </html>

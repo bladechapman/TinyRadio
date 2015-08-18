@@ -77,9 +77,9 @@ function Selector(data, meta_path) {
     }
     this.addToQueue = function(name) {
         if (!(name in nodes)) { return -1; }
-        if (queue[0] && queue[0].name === name) { return 0; }
-        queue[queue.length] = nodes[name];
-        console.log(queue);
+        if ((queue.length > 0 && queue[queue.length - 1] === name) || name === currentSelected) { return 0; }
+        queue[queue.length] = name;
+
         return 1;
     }
     this.removeFromQueue = function() {
@@ -90,14 +90,20 @@ function Selector(data, meta_path) {
     this.peekInQueue = function() {
         return queue[0];
     }
+    this.getQueue = function() {
+        return queue;
+    }
     this.selectNext = function() {
         var file;
-        if (currentSelected === '' || currentSelected === undefined) {    // initially just pick a random node
+        if (queue.length !== 0) {
+            file = this.removeFromQueue();
+        }
+        else if (currentSelected === '' || currentSelected === undefined) {    // initially just pick a random node
             file = nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
         }
         else {
             var originNode = this.findNode(currentSelected);
-            var file = sampleWeighted(originNode.neighbors);
+            file = sampleWeighted(originNode.neighbors);
         }
 
         lastSelected = currentSelected;

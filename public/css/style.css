@@ -7,13 +7,13 @@ body {
     margin-top: 50px;
 }
 
-header {
+.header {
     text-align: center;
 }
-header .primary {
+.header .primary {
     font-size: 120px;
 }
-header .secondary {
+.header .secondary {
     font-size: 20px;
 }
 
@@ -27,6 +27,7 @@ section input {
     font-size: 70px;
     text-align: center;
     margin: 30px 0;
+    width: 90%;
 }
 section input:focus {
     outline: none;
@@ -44,25 +45,25 @@ section input:focus {
    text-align: center;
 }
 
-.list {
+.queue {
 }
-.list .one {
+.queue .one {
     font-size: 60px;
     margin: 6px auto;
 }
-.list .two {
+.queue .two {
     font-size: 50px;
     margin: 5px auto;
 }
-.list .three {
+.queue .three {
     font-size: 40px;
     margin: 4px auto;
 }
-.list .four {
+.queue .four {
     font-size: 30px;
     margin: 3px auto;
 }
-.list .five {
+.queue .five {
     font-size: 20px;
     margin: 2px auto;
 }
@@ -74,7 +75,7 @@ section input:focus {
     text-overflow: ellipsis;
 }
 
-#list_container {
+#queue_container {
     position: relative;
 }
 .gradient {

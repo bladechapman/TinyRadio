@@ -13,6 +13,7 @@ var ntp = require('./tools/ntp-server');
 
 var sound_target = './sound/';
 var type_index = process.argv.indexOf('-source');
+var is_private = (process.argv.indexOf('-private') !== -1);
 if (type_index !== -1 && process.argv[type_index + 1]) {
     sound_target = process.argv[type_index + 1];
     if (sound_target.charAt(sound_target.length - 1) !== '/') { sound_target += '/'; }
@@ -30,22 +31,23 @@ app.use(bodyParser.urlencoded({
 
     dj.addEventListener('next_song', function() {
         io.emit('app:next_song');
-    })
+        io.emit('queue:resp', dj.selector.getQueue());
+    });
 })();
 
 (function initEndpoints() {
     io.on('connection', function(socket) {
         ntp.sync(socket);
         socket.emit('stations_changed', apps.all('tiny-radio'));
+        socket.emit('queue:resp', dj.selector.getQueue());
         setTimeout(function() {
             socket.emit('app:next_song');
         }, 3000);
-    })
-
-    app.get('/nodes', function(req, res) {
+    });
+    app.get('/songs', function(req, res) {
         res.json({
             'message': '[SUCCESS]',
-            'data': dj.selector.getNodes()
+            'data': Object.keys(dj.selector.getNodes())
         });
     });
     app.get('/skip', function(req, res) {
@@ -58,12 +60,13 @@ app.use(bodyParser.urlencoded({
         var status = dj.selector.addToQueue(req.body.name);
         if (status === 1) {
             res.json({'message': '[SUCCESS]'});
+            io.emit('queue:resp', dj.selector.getQueue());
         }
         else if (status === -1) {
-            res.json({'message': '[ERROR] - Cannot add' +  + 'song to queue'});
+            res.status(400).json({'message': '[ERROR] - Cannot add ' + req.body.name + ' song to queue'});
         }
         else {
-            res.json({'message': '[ERROR] - The same song cannot be added twice in a row'});
+            res.status(400).json({'message': '[ERROR] - The same song cannot be added twice in a row'});
         }
     });
     app.post('/vote', function(req, res) {
@@ -113,7 +116,7 @@ for (var i in interfaces) {
 }
 
 var port = process.env.PORT || 8000;
-var hostname = addresses[0];
+var hostname = (is_private || !addresses[0]) ? '127.0.0.1' : addresses[0];
 
 apps.put({
     'name': 'tiny-radio',
