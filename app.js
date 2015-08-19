@@ -20,6 +20,20 @@ if (type_index !== -1 && process.argv[type_index + 1]) {
 }
 var dj = new DJ(sound_target);
 
+var interfaces = os.networkInterfaces();
+var addresses = [];
+for (var i in interfaces) {
+    for (var j in interfaces[i]) {
+        var address = interfaces[i][j];
+        if (address.family === 'IPv4' && !address.internal) {
+            addresses.push(address.address);
+        }
+    }
+}
+
+var port = process.env.PORT || 8000;
+var hostname = (is_private || !addresses[0]) ? '127.0.0.1' : addresses[0];
+
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -38,7 +52,7 @@ app.use(bodyParser.urlencoded({
 (function initEndpoints() {
     io.on('connection', function(socket) {
         ntp.sync(socket);
-        socket.emit('stations_changed', apps.all('tiny-radio'));
+        socket.emit('stations_changed', {'current': (hostname + ':' + port), 'stations': apps.all('tiny-radio')});
         socket.emit('queue:resp', dj.selector.getQueue());
         setTimeout(function() {
             socket.emit('app:next_song');
@@ -104,30 +118,16 @@ function gracefulExit() {
     process.exit();
 }
 
-var interfaces = os.networkInterfaces();
-var addresses = [];
-for (var i in interfaces) {
-    for (var j in interfaces[i]) {
-        var address = interfaces[i][j];
-        if (address.family === 'IPv4' && !address.internal) {
-            addresses.push(address.address);
-        }
-    }
-}
-
-var port = process.env.PORT || 8000;
-var hostname = (is_private || !addresses[0]) ? '127.0.0.1' : addresses[0];
-
 apps.put({
     'name': 'tiny-radio',
     'port': port,
 });
 apps.on('up', function() {
-    io.emit('stations_changed', apps.all('tiny-radio'));
+    io.emit('stations_changed', {'current': (hostname + port), 'stations': apps.all('tiny-radio')});
 });
 apps.on('down', function() {
-    io.emit('stations_changed', apps.all('tiny-radio'));
-})
+    io.emit('stations_changed', {'current': (hostname + port), 'stations': apps.all('tiny-radio')});
+});
 http.listen(port, hostname, function() {
     console.log('listening at IP: ' + hostname + ' on port ' + port);
 });

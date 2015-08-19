@@ -27,15 +27,18 @@ $(function() {
     socket.on('app:next_song', function() {
         loadSound();
     })
-    socket.on('stations_changed', function(new_stations) {
-        console.log(new_stations);
+    socket.on('stations_changed', function(info) {
+        var new_stations = info.stations;
+        var current = info.current;
+
+        $('#station_name').html(current);
         new_stations.forEach(function(station_info) {
             console.log(station_info);
-        });
+            $('.stations').append('<div class="list_item"><a href="http://' + station_info.address + '">' + station_info.address + '</div>');
+        })
     });
     socket.on('queue:resp', function(queued_songs) {
         console.log('RECEIVED QUEUE');
-        console.log(queued_songs);
         $('.two').html(filter_filename(queued_songs[0] || ''));
         $('.three').html(filter_filename(queued_songs[1] || ''))
         $('.four').html(filter_filename(queued_songs[2] || ''));

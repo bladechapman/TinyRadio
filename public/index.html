@@ -17,23 +17,17 @@
 
     </head>
 
-    <!-- <div id="cover">
-        <img class="cover_image" src="./assets/boombox.png" />
-        <div class="cover_text">Tuning your radio...</div>
-    </div> -->
-
-    <!-- <div class='mobile_activate'>Mobile? Out of sync? Click here</div> -->
-
     <div class="header">
         <div class="primary mobile_activate">TinyRadio</div>
-        <div class="secondary">Station *TEST*</div>
+        <div class="secondary">
+            Station <span id="station_name"></span>
+            <div class="stations"></div>
+        </div>
     </div>
 
     <section>
         <input id="search" type="text" placeholder="Queue a song"></input>
-        <div class="list">
-        </div>
-        <!-- <button>test_animations</button> -->
+        <div class="list"></div>
         <div id="queue_container">
             <div class="gradient"></div>
             <div class="queue">
@@ -44,42 +38,9 @@
                 <div class="tr five"></div>
             </div>
         </div>
-        <!-- <div id="title">Stations near you</div>
-        <div id="list"></div>
-        <div id="chart"></div>
-        <div id="tip"></div> -->
     </section>
 
-    <!--
-    <script>
-        $('button').click(function() {
-            console.log('CLICK');
-            $('.two').toggleClass('two').toggleClass('one');
-            // $('.two').toggleClass('animate_two');
-            // $('.three').toggleClass('animate_three');
-            // $('.four').toggleClass('animate_four');
-            // $('.five').toggleClass('animate_five');
-        })
-    </script>
-    -->
-
-    <!-- <div class="menu_wrapper position_right">
-        <div class="up_button material_button">
-            <i class="fa fa-angle-up"></i>
-        </div>
-    </div>
-    <div class="menu_wrapper position_left">
-        <div class="down_button material_button">
-            <i class="fa fa-angle-down"></i>
-        </div>
-    </div> -->
-
     <footer>
-        <!-- <img class="footer_image" src="./assets/radio.png" />
-        <div class="info">
-            <div class="song_header">You're listening to...</div>
-            <div class="songname"></div>
-        </div> -->
     </footer>
 
 </html>

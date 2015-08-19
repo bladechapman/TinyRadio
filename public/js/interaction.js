@@ -11,7 +11,6 @@ $(function() {
         }
     }
 
-
     function filterSongs(sub) {
         ret = []
         songs.forEach(function(title) {
@@ -21,24 +20,30 @@ $(function() {
         });
         return ret;
     }
+    var empty_interval;
     $('#search').on('keyup', function() {
-        console.log($('#search').val());
         if ($('#search').val().length === 0) {
-            $('.list').empty();
+            $('.list').removeClass('expanded');
+            empty_interval = setTimeout(function() {
+                $('.list').empty();
+                console.log('EMPTY');
+                empty_interval = null;
+            }, 200);
         }
         else {
+            if (empty_interval) {
+                clearInterval(empty_interval);
+            }
             filtered_songs = filterSongs($('#search').val());
             $('.list').empty();
             filtered_songs.forEach(function(songname, index) {
-                $('.list').append('<div index="' + index + '">' + window.filter_filename(songname) + '</div>');
+                $('.list').append('<div class="list_item" index="' + index + '">' + window.filter_filename(songname) + '</div>');
             });
+            $('.list').addClass('expanded');
         }
     });
     $('.list').click(function(event) {
-        console.log(event.target.attributes['index'].value);
         var index = event.target.attributes['index'].value;
-
-        console.log(filtered_songs[index]);
         $.ajax({
             type: 'POST',
             url: '/enqueue',
@@ -52,6 +57,11 @@ $(function() {
                 console.log('ERROR');
             }
         })
+    });
+    $('.secondary').hover(function() {
+        $('.stations').addClass('expanded');
+    }, function() {
+        $('.stations').removeClass('expanded');
     });
 
     // $('.up_button').click(function() {
