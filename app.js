@@ -129,5 +129,5 @@ apps.on('down', function() {
     io.emit('stations_changed', {'current': (hostname + port), 'stations': apps.all('tiny-radio')});
 });
 http.listen(port, hostname, function() {
-    console.log('listening at IP: ' + hostname + ' on port ' + port);
+    console.log('listening at IP: ' + hostname + ':' + port);
 });

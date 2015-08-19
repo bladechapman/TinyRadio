@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'Varela Round';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Varela Round'), local('VarelaRound-Regular'), url(../assets/valeraround.ttf) format('truetype');
+}
 html {
     font-family: 'Varela Round', sans-serif;
     overflow-x: hidden;
@@ -111,7 +117,7 @@ section input:focus {
 }
 .stations {
     margin: 0 auto;
-    width: 240px;
+    width: 300px;
     overflow-y: scroll;
     overflow-x: hidden;
     border-top: 1px solid gray;
