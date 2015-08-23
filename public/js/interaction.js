@@ -2,6 +2,30 @@ $(function() {
     var songs = [];
     var filtered_songs = [];
 
+    var flashAnimation = (function flashAnimationGenerator() {
+        var intervals = {};
+        var animation_duration = 500;
+        return function(element, classname) {
+            if (intervals[element]) {
+                intervals[element]();    // remove the current animation
+            }
+
+            $(element).addClass(classname);
+            window.requestAnimationFrame(function() {
+                $(element).addClass('animate');
+                $(element).removeClass(classname);
+
+                // circular dependency is resolved by the async nature of removeAnimation
+                interval = setTimeout(removeAnimation, animation_duration);
+                function removeAnimation() {
+                    $(element).removeClass('animate');
+                    intervals[element] = null;
+                    clearInterval(interval);
+                }
+                intervals[element] = removeAnimation;
+            })
+        }
+    })();
     function filterSongs(sub) {
         var ret = []
         songs.forEach(function(title) {
@@ -37,14 +61,18 @@ $(function() {
     });
     $('.list').click(function(event) {
         var index = event.target.attributes['index'].value;
+
         $.ajax({
             type: 'POST',
             url: '/enqueue',
             data: {
                 'name': filtered_songs[index]
             },
-            error: function() {
-                console.log('Error enqueing song!');
+            success: function() {
+                flashAnimation(event.target, 'success');
+            },
+            error: function(err) {
+                flashAnimation(event.target, 'failure');
             }
         });
     });

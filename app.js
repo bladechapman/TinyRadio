@@ -12,16 +12,17 @@ var ntp = require('./tools/ntp-server');
 var sound_target = './sound/';
 var source_index = process.argv.indexOf('-source');
 var is_private = (process.argv.indexOf('-private') !== -1);
-var dj = new DJ(sound_target);
 var interfaces = os.networkInterfaces();
 var addresses = [];
 var port = process.env.PORT || 8000;
 var hostname = (is_private || !addresses[0]) ? '127.0.0.1' : addresses[0];
+var dj;
 
 if (source_index !== -1 && process.argv[source_index + 1]) {
     sound_target = process.argv[source_index + 1];
     if (sound_target.charAt(sound_target.length - 1) !== '/') { sound_target += '/'; }
 }
+dj = new DJ(sound_target);
 for (var i in interfaces) {
     for (var j in interfaces[i]) {
         var address = interfaces[i][j];
