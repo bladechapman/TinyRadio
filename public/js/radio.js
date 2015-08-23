@@ -6,7 +6,6 @@ $(function() {
     var source;
     var serverOffset; // server timestamp
     var serv_mutex = false;
-
     setInterval(loadSound, 60000);
 
     $('.mobile_activate').click(function() {
@@ -17,34 +16,32 @@ $(function() {
 
         loadSound();
     });
-
-    ntp.init(socket, {
-        interval : 333,
-        decay : 0,
-        decayLimit : 60000,
-        buffer: 30
-    });
-    socket.on('app:next_song', function() {
-        loadSound();
-    })
-    socket.on('stations_changed', function(info) {
-        var new_stations = info.stations;
-        var current = info.current;
-
-        $('#station_name').html(current);
-        new_stations.forEach(function(station_info) {
-            console.log(station_info);
-            $('.stations').append('<div class="list_item"><a href="http://' + station_info.address + '">' + station_info.address + '</div>');
+    (function init_io() {
+        ntp.init(socket, {
+            interval : 333,
+            decay : 0,
+            decayLimit : 60000,
+            buffer: 30
+        });
+        socket.on('app:next_song', function() {
+            loadSound();
         })
-    });
-    socket.on('queue:resp', function(queued_songs) {
-        console.log('RECEIVED QUEUE');
-        $('.two').html(filter_filename(queued_songs[0] || ''));
-        $('.three').html(filter_filename(queued_songs[1] || ''))
-        $('.four').html(filter_filename(queued_songs[2] || ''));
-        $('.five').html(filter_filename(queued_songs[3] || ''))
-    });
+        socket.on('stations_changed', function(info) {
+            var new_stations = info.stations;
+            var current = info.current;
 
+            $('#station_name').html(current);
+            new_stations.forEach(function(station_info) {
+                $('.stations').append('<div class="list_item"><a href="http://' + station_info.address + '">' + station_info.address + '</div>');
+            })
+        });
+        socket.on('queue:resp', function(queued_songs) {
+            $('.two').html(filterFilename(queued_songs[0] || ''));
+            $('.three').html(filterFilename(queued_songs[1] || ''))
+            $('.four').html(filterFilename(queued_songs[2] || ''));
+            $('.five').html(filterFilename(queued_songs[3] || ''))
+        });
+    })();
     function async(limit, async_finally) {
         var internalCounter = 0;
         var internalLimit = limit;
@@ -56,22 +53,8 @@ $(function() {
             }
         }
     }
-    window.filter_filename = function filter_filename(file) {
-        var ext_arr = file.split('.');
-        var ext = ext_arr.slice(0, ext_arr.length - 1).join();
-        var path_arr = ext.split('/');
-        var file = path_arr.slice(path_arr.length -1, path_arr.length).join();
-
-        file = file.replace(/\\\s/g, ' ');
-        file = file.replace(/\\\(/g, '(');
-        file = file.replace(/\\\)/g, ')');
-        file = file.replace(/\\\&/g, '&');
-        file = file.replace(/\\\'/g, '\'');
-
-        return file;
-    }
     function process(data, info) {
-        $('.songname').html(filter_filename(info.file));
+        $('.songname').html(filterFilename(info.file));
 
         var temp_source = context.createBufferSource()
         context.decodeAudioData(data, function(decoded) {
@@ -84,8 +67,6 @@ $(function() {
 
             var elapsedTime = (requestTime + songTime) / 1000;
 
-            console.log('ntp offset: ' + ntp.offset());
-
             temp_source.start(context.currentTime, elapsedTime);
 
             if (source) { source.stop(0);}
@@ -95,8 +76,6 @@ $(function() {
     function loadSound() {
         if (serv_mutex) { return; }
         serv_mutex = true;
-
-        console.log('load sound attempt');
 
         var infoReq = new XMLHttpRequest();
         infoReq.open('GET', '/info', true);
@@ -120,12 +99,25 @@ $(function() {
             data = songReq.response;
             asyncNetwork();
         }
-
         infoReq.onreadystatechange = function() {
             if (infoReq.readyState == 4 && infoReq.status == 200) {
                 info = infoReq.response;
                 asyncNetwork();
             }
         }
+    }
+    window.filterFilename = function filterFilename(file) {
+        var ext_arr = file.split('.');
+        var ext = ext_arr.slice(0, ext_arr.length - 1).join();
+        var path_arr = ext.split('/');
+        var file = path_arr.slice(path_arr.length -1, path_arr.length).join();
+
+        file = file.replace(/\\\s/g, ' ');
+        file = file.replace(/\\\(/g, '(');
+        file = file.replace(/\\\)/g, ')');
+        file = file.replace(/\\\&/g, '&');
+        file = file.replace(/\\\'/g, '\'');
+
+        return file;
     }
 });

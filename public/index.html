@@ -10,34 +10,38 @@
         <script type="text/javascript" src="./js/ntp-client.js"></script>
         <script type="text/javascript" src="./js/radio.js"></script>
         <script type="text/javascript" src="./js/interaction.js"></script>
-        <link rel="stylesheet" href="./css/style.css">
 
+        <link rel="stylesheet" href="./css/reactive.css">
+        <link rel="stylesheet" href="./css/style.css">
     </head>
 
     <div class="header">
         <div class="primary mobile_activate">TinyRadio</div>
         <div class="secondary">
             Station <span id="station_name"></span>
+
+            <div class="divider small"></div>
             <div class="stations"></div>
+            <div class="divider small"></div>
         </div>
     </div>
 
     <section>
         <input id="search" type="text" placeholder="Queue a song"></input>
+
+        <div class="divider large"></div>
         <div class="list"></div>
+        <div class="divider large"></div>
+
         <div id="queue_container">
             <div class="gradient"></div>
             <div class="queue">
-                <div class="tr one songname"></div>
-                <div class="tr two"></div>
-                <div class="tr three"></div>
-                <div class="tr four"></div>
-                <div class="tr five"></div>
+                <div class="queue_item one songname"></div>
+                <div class="queue_item two"></div>
+                <div class="queue_item three"></div>
+                <div class="queue_item four"></div>
+                <div class="queue_item five"></div>
             </div>
         </div>
     </section>
-
-    <footer>
-    </footer>
-
 </html>

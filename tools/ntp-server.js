@@ -1,5 +1,4 @@
 exports.sync = function(socket) {
-
     if (socket.listeners('ntp:client_ticket') > 0) {
         return;
     }

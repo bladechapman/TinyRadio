@@ -9,7 +9,7 @@ function Node(name) {
 function Selector(data, meta_path) {
     var curSelector = this;
     var nodes = {};
-    var queue = [];     // note, implementation is lazy - poor performance for large sets
+    var queue = [];     // NOTE: implementation is lazy - poor performance for large sets
     var lastSelected = undefined;
     var currentSelected = undefined;
     var initial_ranking = 5;
@@ -78,7 +78,12 @@ function Selector(data, meta_path) {
     this.addToQueue = function(name) {
         if (!(name in nodes)) { return -1; }
         if ((queue.length > 0 && queue[queue.length - 1] === name) || name === currentSelected) { return 0; }
-        queue[queue.length] = name;
+
+        if (queue.length > 0) {
+            var last = nodes[queue[queue.length - 1]];
+            if (last.neighbors && last.neighbors[name]) { last.neighbors[name] += 1; }
+        }
+        queue.push(name)
 
         return 1;
     }

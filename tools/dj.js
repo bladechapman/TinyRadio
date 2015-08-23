@@ -29,11 +29,9 @@ function DJ(path) {
         watcher.on('all', function(event, path) {;
             if (event === 'unlink') {
                 cur_dj.selector.removeNode(path);
-                // console.log(cur_dj.selector.getNodes());
             }
             else if (event === 'add') {
                 cur_dj.selector.addNode(path);
-                // console.log(cur_dj.selector.getNodes());
             }
             else if (event === 'addDir') {
                 files = recursiveReaddirSync(path);
@@ -78,7 +76,6 @@ function DJ(path) {
         return ret;
     }
     function findDuration(path, callback) {
-        // console.log(path);
         childProcess.exec('ffmpeg -i \"' + path + "\"", function(error, stdout, stderr) {
             var dur_string = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
             var dur_string_arr = dur_string.split('.')[0].split(':');
@@ -99,9 +96,6 @@ function DJ(path) {
 
         try {
             findDuration(file, function(duration) {
-                // duration needs to be adjusted to playback speed of Audio API player
-                // console.log('Selected file: ' + file);
-
                 clearTimeout(timout);
                 timout = setTimeout(function() {
                     cur_dj.startNextTrack(function() {});
