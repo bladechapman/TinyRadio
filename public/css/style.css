@@ -145,6 +145,7 @@ section input:focus {
 }
 .small {
     width: 40px;
+    background-color: black !important;
 }
 .large {
     width: 450px;
