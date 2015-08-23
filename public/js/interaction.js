@@ -61,6 +61,7 @@ $(function() {
     });
     $('.list').click(function(event) {
         var index = event.target.attributes['index'].value;
+        $('#search').focus();
 
         $.ajax({
             type: 'POST',

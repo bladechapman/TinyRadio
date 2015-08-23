@@ -78,7 +78,7 @@ function Selector(data, meta_path) {
     this.addToQueue = function(name) {
         if (!(name in nodes)) { return -1; }
         if ((queue.length > 0 && queue[queue.length - 1] === name) ||
-            (name === currentSelected && queue.length === 1)) {
+            (name === currentSelected && queue.length === 0)) {
             return 0;
         }
         if (queue.length > 0) {
