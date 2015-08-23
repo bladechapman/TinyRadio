@@ -15,7 +15,7 @@ var is_private = (process.argv.indexOf('-private') !== -1);
 var interfaces = os.networkInterfaces();
 var addresses = [];
 var port = process.env.PORT || 8000;
-var hostname = (is_private || !addresses[0]) ? '127.0.0.1' : addresses[0];
+var hostname;
 var dj;
 
 if (source_index !== -1 && process.argv[source_index + 1]) {
@@ -31,6 +31,8 @@ for (var i in interfaces) {
         }
     }
 }
+hostname = (is_private || !addresses[0]) ? '127.0.0.1' : addresses[0];
+
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
