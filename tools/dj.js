@@ -17,7 +17,7 @@ function DJ(path) {
     this.path = path;
     this.startTimestamp = 0;
     this.events = {}    // name, callbacks
-    this.selector = new Selector(filterDirectory(this.path));
+    this.selector = new Selector(filterDirectory(this.path), undefined, this.path);
 
     this.registerEvent('next_song');
 

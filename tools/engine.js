@@ -6,13 +6,14 @@ function Node(name) {
 }
 
 // takes a list of song names to generate graph
-function Selector(data, meta_path) {
+function Selector(data, meta_path, data_path) {
     var curSelector = this;
     var nodes = {};
     var queue = [];     // NOTE: implementation is lazy - poor performance for large sets
     var lastSelected;
     var currentSelected;
-    var meta_data;
+    var meta_data = {};
+    var path_meta_data = {};
     var initial_ranking = 5;
     meta_path = meta_path || './';
 
@@ -55,14 +56,14 @@ function Selector(data, meta_path) {
     this.addNode = function(name) {
         var newNode = new Node(name);
         for (var node_name in nodes) {
-            if (meta_data && meta_data[name] && meta_data[name].neighbors && meta_data[name].neighbors[node_name]) {
-                newNode.neighbors[node_name] = meta_data[name].neighbors[node_name];
+            if (path_meta_data && path_meta_data[name] && path_meta_data[name].neighbors && path_meta_data[name].neighbors[node_name]) {
+                newNode.neighbors[node_name] = path_meta_data[name].neighbors[node_name];
             } else {
                 newNode.neighbors[node_name] = initial_ranking;
             }
 
-            if (meta_data && meta_data[node_name] && meta_data[node_name].neighbors && meta_data[node_name].neighbors[name]) {
-                nodes[node_name].neighbors[newNode.name] = meta_data[node_name].neighbors[name];
+            if (path_meta_data && path_meta_data[node_name] && path_meta_data[node_name].neighbors && path_meta_data[node_name].neighbors[name]) {
+                nodes[node_name].neighbors[newNode.name] = path_meta_data[node_name].neighbors[name];
             } else {
                 nodes[node_name].neighbors[newNode.name] = initial_ranking;
             }
@@ -127,11 +128,14 @@ function Selector(data, meta_path) {
         }
     }
     this.saveMetadata = function() {
-        fs.writeFileSync(meta_path + 'sound_meta.json', JSON.stringify(nodes));
+        console.log(nodes);
+        meta_data[fs.realpathSync(data_path)] = nodes;
+        fs.writeFileSync(meta_path + 'sound_meta.json', JSON.stringify(meta_data));
     }
 
     try {
         meta_data = JSON.parse(fs.readFileSync(meta_path + 'sound_meta.json', {encoding: 'utf8'}));
+        path_meta_data = meta_data[fs.realpathSync(data_path)];
         curSelector.initializeGraph();
     }
     catch (err) {
