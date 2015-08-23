@@ -67,14 +67,27 @@ section input:focus {
 }
 .list {
     max-height: 0px;
-    transition: max-height 0.2s ease-in-out;
     overflow: scroll;
     width: 80%;
     margin: 0 auto;
+    transition: max-height 0.2s ease-in-out;
 }
 .list_item {
     cursor: pointer;
     margin: 2px 0;
+    border-radius: 10px;
+}
+.success {
+    background-color: rgb(76, 217, 100);
+}
+.failure {
+    background-color: rgb(255, 45, 85);
+}
+.animate {
+    transition: all 0.5s ease-in-out;
+}
+.expanded {
+    max-height: 300px !important;
 }
 
 /************ QUEUE ************/
@@ -128,14 +141,12 @@ section input:focus {
 .divider {
     height: 1px;
     margin: 0 auto;
-    background-color: gray;
+    background-color: rgb(142, 142, 147);
 }
 .small {
     width: 40px;
+    background-color: black !important;
 }
 .large {
-    width: 55%;
-}
-.expanded {
-    max-height: 300px !important;
+    width: 450px;
 }

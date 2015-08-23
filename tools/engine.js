@@ -10,11 +10,11 @@ function Selector(data, meta_path) {
     var curSelector = this;
     var nodes = {};
     var queue = [];     // NOTE: implementation is lazy - poor performance for large sets
-    var lastSelected = undefined;
-    var currentSelected = undefined;
+    var lastSelected;
+    var currentSelected;
+    var meta_data;
     var initial_ranking = 5;
-    var meta_data = undefined;
-        meta_path = meta_path || './';
+    meta_path = meta_path || './';
 
     function sampleWeighted(weights) {
         list = [];
@@ -77,8 +77,10 @@ function Selector(data, meta_path) {
     }
     this.addToQueue = function(name) {
         if (!(name in nodes)) { return -1; }
-        if ((queue.length > 0 && queue[queue.length - 1] === name) || name === currentSelected) { return 0; }
-
+        if ((queue.length > 0 && queue[queue.length - 1] === name) ||
+            (name === currentSelected && queue.length === 0)) {
+            return 0;
+        }
         if (queue.length > 0) {
             var last = nodes[queue[queue.length - 1]];
             if (last.neighbors && last.neighbors[name]) { last.neighbors[name] += 1; }
@@ -89,7 +91,6 @@ function Selector(data, meta_path) {
     }
     this.removeFromQueue = function() {
         var ret = queue.shift();
-        console.log(queue);
         return ret;
     }
     this.peekInQueue = function() {
