@@ -128,7 +128,6 @@ function Selector(data, meta_path, data_path) {
         }
     }
     this.saveMetadata = function() {
-        console.log(nodes);
         meta_data[fs.realpathSync(data_path)] = nodes;
         fs.writeFileSync(meta_path + 'sound_meta.json', JSON.stringify(meta_data));
     }

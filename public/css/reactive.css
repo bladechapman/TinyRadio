@@ -1,0 +1,50 @@
+@media all and (max-width: 412px) {
+
+    /************ HEADER ************/
+    .header .primary {
+        font-size: 60px;
+    }
+
+    /************ INPUT ************/
+    section input {
+        font-size: 30px;
+    }
+
+    /************ QUEUE ************/
+    .queue .one {
+        font-size: 20px;
+        margin: 6px auto;
+    }
+    .queue .two {
+        font-size: 15px;
+        margin: 2px auto;
+    }
+    .queue .three {
+        font-size: 10px;
+        margin: 2px auto;
+    }
+    .queue .four {
+        font-size: 5px;
+        margin: 2px auto;
+    }
+    .queue .five {
+        font-size: 3px;
+        margin: 2px auto;
+    }
+    .queue_item {
+        width: 90%;
+        height: 30px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /************ DIVIDER ************/
+    .small {
+        width: 20px;
+        background-color: black;
+    }
+    .large {
+        width: 225px;
+    }
+}
