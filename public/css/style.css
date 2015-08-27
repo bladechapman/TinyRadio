@@ -23,6 +23,8 @@ a {
 }
 .header .primary {
     font-size: 120px;
+    height: 300px;
+
 }
 .header .secondary {
     font-size: 20px;
@@ -38,6 +40,13 @@ a {
     -webkit-transition: max-height 0.2s ease-in-out;
     -moz-transition: max-height 0.2s ease-in-out;
     -o-transition: max-height 0.2s ease-in-out;
+}
+.header .spacer {
+    height: 20px;
+}
+#logo {
+    width: 300px;
+    height: 300px;
 }
 
 /************ INPUT ************/

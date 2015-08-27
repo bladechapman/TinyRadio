@@ -1,8 +1,12 @@
 @media all and (max-width: 640px) {
-
     /************ HEADER ************/
     .header .primary {
         font-size: 60px;
+        height: 150px;
+    }
+    #logo {
+        width: 150px;
+        height: 150px;
     }
 
     /************ INPUT ************/
