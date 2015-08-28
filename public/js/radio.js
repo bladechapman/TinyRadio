@@ -54,7 +54,9 @@ $(function() {
         }
     }
     function process(data, info) {
-        $('.songname').html(filterFilename(info.file));
+        var filename = filterFilename(info.file)
+        $('.songname').html(filename);
+        document.title = "TinyRadio: " + filename;
 
         var temp_source = context.createBufferSource()
         context.decodeAudioData(data, function(decoded) {

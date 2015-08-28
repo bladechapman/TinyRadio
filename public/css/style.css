@@ -9,9 +9,6 @@ html {
     font-family: 'Varela Round', sans-serif;
     overflow-x: hidden;
 }
-body {
-    margin-top: 50px;
-}
 a {
     text-decoration: none;
     color: #000000;
