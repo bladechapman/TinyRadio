@@ -2,13 +2,14 @@ var express = require('express');
 var path = require('path');
 var fs = require('fs');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 var DJ = require('./tools/dj');
-var app = express();
 var apps = require('polo')();
 var os = require('os');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var ntp = require('./tools/ntp-server');
+var app = express();
 var sound_target = './sound/';
 var source_index = process.argv.indexOf('-source');
 var is_private = (process.argv.indexOf('-private') !== -1);
@@ -18,21 +19,6 @@ var port = process.env.PORT || 8000;
 var hostname;
 var dj;
 
-if (source_index !== -1 && process.argv[source_index + 1]) {
-    sound_target = process.argv[source_index + 1];
-    if (sound_target.charAt(sound_target.length - 1) !== '/') { sound_target += '/'; }
-}
-dj = new DJ(sound_target);
-for (var i in interfaces) {
-    for (var j in interfaces[i]) {
-        var address = interfaces[i][j];
-        if (address.family === 'IPv4' && !address.internal) {
-            addresses.push(address.address);
-        }
-    }
-}
-hostname = (is_private || !addresses[0]) ? '127.0.0.1' : addresses[0];
-
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -40,6 +26,12 @@ app.use(bodyParser.urlencoded({
 }));
 
 (function startDJ(){
+    if (source_index !== -1 && process.argv[source_index + 1]) {
+        sound_target = process.argv[source_index + 1];
+        if (sound_target.charAt(sound_target.length - 1) !== '/') { sound_target += '/'; }
+    }
+    dj = new DJ(sound_target);
+
     dj.startNextTrack();
     dj.addEventListener('next_song', function() {
         io.emit('app:next_song');
@@ -47,6 +39,16 @@ app.use(bodyParser.urlencoded({
     });
 })();
 (function initEndpoints() {
+    for (var i in interfaces) {
+        for (var j in interfaces[i]) {
+            var address = interfaces[i][j];
+            if (address.family === 'IPv4' && !address.internal) {
+                addresses.push(address.address);
+            }
+        }
+    }
+    hostname = (is_private || !addresses[0]) ? '127.0.0.1' : addresses[0];
+
     io.on('connection', function(socket) {
         ntp.sync(socket);
         socket.emit('stations_changed', {'current': (hostname + ':' + port), 'stations': apps.all('tiny-radio')});
@@ -100,8 +102,6 @@ app.use(bodyParser.urlencoded({
 })();
 
 http.listen(port, hostname, function() {
-    console.log('listening at IP: ' + hostname + ':' + port);
-
     apps.put({
         'name': 'tiny-radio',
         'port': port,
@@ -112,4 +112,6 @@ http.listen(port, hostname, function() {
     apps.on('down', function() {
         io.emit('stations_changed', {'current': (hostname + port), 'stations': apps.all('tiny-radio')});
     });
+
+    console.log('listening at IP: ' + hostname + ':' + port);
 });

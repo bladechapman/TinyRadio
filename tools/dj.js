@@ -4,6 +4,11 @@ var recursiveReaddirSync = require('recursive-readdir-sync');
 var chok = require('chokidar');
 var Selector = require('./engine');
 
+
+/**
+TEST
+**/
+
 function DJ(path) {
     var cur_dj = this;
     var timout;
@@ -21,33 +26,33 @@ function DJ(path) {
 
     this.registerEvent('next_song');
 
-    watcher = chok.watch(path, {
-        'persistent': true,
-        'usePolling': false
-    });
-    watcher.on('ready', function(event, path) {
-        watcher.on('all', function(event, path) {;
-            if (event === 'unlink') {
-                cur_dj.selector.removeNode(path);
-            }
-            else if (event === 'add') {
-                cur_dj.selector.addNode(path);
-            }
-            else if (event === 'addDir') {
-                files = recursiveReaddirSync(path);
-                files.forEach(function(element) {
-                    cur_dj.selector.addNode(element);
-                });
-            }
-        });
-    });
-    watcher.on('error', function(error) {
-        console.log('Error watching files');
-        console.log(err);
-        console.log('exiting gracefully');
-        cur_dj.selector.saveMetadata();
-        process.exit();
-    });
+    // watcher = chok.watch(path, {
+    //     'persistent': true,
+    //     'usePolling': false
+    // });
+    // watcher.on('ready', function(event, path) {
+    //     watcher.on('all', function(event, path) {;
+    //         if (event === 'unlink') {
+    //             cur_dj.selector.removeNode(path);
+    //         }
+    //         else if (event === 'add') {
+    //             cur_dj.selector.addNode(path);
+    //         }
+    //         else if (event === 'addDir') {
+    //             files = recursiveReaddirSync(path);
+    //             files.forEach(function(element) {
+    //                 cur_dj.selector.addNode(element);
+    //             });
+    //         }
+    //     });
+    // });
+    // watcher.on('error', function(error) {
+    //     console.log('Error watching files');
+    //     console.log(err);
+    //     console.log('exiting gracefully');
+    //     cur_dj.selector.saveMetadata();
+    //     process.exit();
+    // });
 
     function filterDirectory(path) {
         var files = [];
@@ -77,6 +82,7 @@ function DJ(path) {
     }
     function findDuration(path, callback) {
         childProcess.exec('ffmpeg -i \"' + path + "\"", function(error, stdout, stderr) {
+            console.log(stdout + stderr);
             var dur_string = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
             var dur_string_arr = dur_string.split('.')[0].split(':');
             dur_string_arr.push(dur_string.split('.')[1].substring(0, 2));
@@ -85,7 +91,7 @@ function DJ(path) {
                     parseInt(dur_string_arr[1]) * 60 * 1000 +
                     parseInt(dur_string_arr[2]) * 1000 +
                     parseInt(dur_string_arr[3]));
-        })
+        });
     }
 
     this.startNextTrack = function(callback) {
@@ -135,5 +141,8 @@ DJ.prototype.dispatchEvent = function(eventName, eventArgs) {
         callback(eventArgs);
     })
 }
+
+
+var test_dj = new DJ('./sound');
 
 module.exports = DJ;
