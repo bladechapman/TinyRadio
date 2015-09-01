@@ -4,9 +4,9 @@ $(function() {
     var context = new AudioContext();
     var socket = io();
     var source;
-    var serverOffset; // server timestamp
+    var serverOffset;
     var serv_mutex = false;
-    setInterval(loadSound, 60000);
+    setInterval(loadSound, 60000); // set refresh rate for sound to auto-resync
 
     $('.mobile_activate').click(function() {
         oscillator = context.createOscillator();
@@ -30,9 +30,6 @@ $(function() {
             var new_stations = info.stations;
             var current = info.current;
 
-            console.log(current);
-            console.log(new_stations);
-
             $('#station_name').html(current);
             new_stations.forEach(function(station_info) {
                 $('.stations').append('<div class="list_item"><a href="http://' + station_info.address + '">' + station_info.address + '</div>');
@@ -45,6 +42,7 @@ $(function() {
             $('.five').html(filterFilename(queued_songs[3] || ''))
         });
     })();
+
     function async(limit, async_finally) {
         var internalCounter = 0;
         var internalLimit = limit;
@@ -64,7 +62,7 @@ $(function() {
         var temp_source = context.createBufferSource()
         context.decodeAudioData(data, function(decoded) {
             temp_source.buffer = decoded;
-            temp_source.connect(context.destination);    // connect to whatever is rendering the audio (speakers)
+            temp_source.connect(context.destination);    // connect to whatever is rendering the audio (speakers in this case)
 
             // positive ntp indicates client is ahead of server
             var requestTime = (Date.now() - ntp.offset()) - info.servTimestamp;
@@ -75,10 +73,14 @@ $(function() {
             console.log('ntp offset: ' + ntp.offset());
 
             temp_source.start(context.currentTime, elapsedTime);
+            console.log('ATTEMPTING START');
 
             if (source) { source.stop(0);}
             source = temp_source;
-        })
+            source.onended = function() {
+                console.log('SONG ENDED');
+            }
+        });
     }
     function loadSound() {
         if (serv_mutex) { return; }
