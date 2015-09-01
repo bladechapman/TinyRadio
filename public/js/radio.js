@@ -30,6 +30,9 @@ $(function() {
             var new_stations = info.stations;
             var current = info.current;
 
+            console.log(current);
+            console.log(new_stations);
+
             $('#station_name').html(current);
             new_stations.forEach(function(station_info) {
                 $('.stations').append('<div class="list_item"><a href="http://' + station_info.address + '">' + station_info.address + '</div>');

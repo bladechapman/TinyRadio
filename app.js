@@ -49,7 +49,7 @@ app.use(bodyParser.urlencoded({
 (function initEndpoints() {
     io.on('connection', function(socket) {
         ntp.sync(socket);
-        socket.emit('stations_changed', {'current': (hostname + ':' + port), 'stations': apps.all('tiny-radio')});
+        socket.emit('stations_changed', {'current': (hostname + ':' + port), 'stations': (hostname !== '127.0.0.1') ? apps.all('tiny-radio') : []});
         socket.emit('queue:resp', dj.selector.getQueue());
         setTimeout(function() {
             socket.emit('app:next_song');
