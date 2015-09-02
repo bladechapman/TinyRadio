@@ -32,7 +32,9 @@ $(function() {
 
             $('#station_name').html(current);
             new_stations.forEach(function(station_info) {
-                $('.stations').append('<div class="list_item"><a href="http://' + station_info.address + '">' + station_info.address + '</div>');
+                if (station_info.address !== current) {
+                    $('.stations').append('<div class="list_item"><a href="http://' + station_info.address + '">' + station_info.address + '</div>');
+                }
             })
         });
         socket.on('queue:resp', function(queued_songs) {
