@@ -1,4 +1,6 @@
 var fs = require('fs');
+var sqlite3 = require('sqlite3').verbose();
+var db = new sqlite3.Database('tinyradio');
 
 function Node(name) {
     this.name = name;
@@ -8,7 +10,7 @@ function Node(name) {
 // takes a list of song names to generate graph
 function Selector(data, meta_path, data_path) {
     var curSelector = this;
-    var nodes = {};
+    // var nodes = {};
     var queue = [];     // NOTE: implementation is lazy - poor performance for large sets
     var lastSelected;
     var currentSelected;
@@ -34,7 +36,7 @@ function Selector(data, meta_path, data_path) {
         }
     }
     this.initializeGraph = function() {
-        nodes = {};
+        // nodes = {};
         if (data) {
             for (var i = 0; i < data.length; i++) {
                 curSelector.addNode(data[i]);
@@ -48,29 +50,33 @@ function Selector(data, meta_path, data_path) {
         return lastSelected;
     }
     this.getNodes = function() {
+        // use DB query to return nodes
         return nodes;
     }
     this.findNode = function (name) {
+        // DB query
         return nodes[name];
     }
     this.addNode = function(name) {
-        var newNode = new Node(name);
-        for (var node_name in nodes) {
-            if (path_meta_data && path_meta_data[name] && path_meta_data[name].neighbors && path_meta_data[name].neighbors[node_name]) {
-                newNode.neighbors[node_name] = path_meta_data[name].neighbors[node_name];
-            } else {
-                newNode.neighbors[node_name] = initial_ranking;
-            }
+        // DB query - change to adding edges
+        // var newNode = new Node(name);
+        // for (var node_name in nodes) {
+        //     if (path_meta_data && path_meta_data[name] && path_meta_data[name].neighbors && path_meta_data[name].neighbors[node_name]) {
+        //         newNode.neighbors[node_name] = path_meta_data[name].neighbors[node_name];
+        //     } else {
+        //         newNode.neighbors[node_name] = initial_ranking;
+        //     }
 
-            if (path_meta_data && path_meta_data[node_name] && path_meta_data[node_name].neighbors && path_meta_data[node_name].neighbors[name]) {
-                nodes[node_name].neighbors[newNode.name] = path_meta_data[node_name].neighbors[name];
-            } else {
-                nodes[node_name].neighbors[newNode.name] = initial_ranking;
-            }
-        }
-        nodes[newNode.name] = newNode;
+        //     if (path_meta_data && path_meta_data[node_name] && path_meta_data[node_name].neighbors && path_meta_data[node_name].neighbors[name]) {
+        //         nodes[node_name].neighbors[newNode.name] = path_meta_data[node_name].neighbors[name];
+        //     } else {
+        //         nodes[node_name].neighbors[newNode.name] = initial_ranking;
+        //     }
+        // }
+        // nodes[newNode.name] = newNode;
     }
     this.removeNode = function(name) {
+        // DB query
         delete nodes[name];
         for (var node in nodes) {
             delete nodes[node].neighbors[name];
@@ -132,16 +138,36 @@ function Selector(data, meta_path, data_path) {
         fs.writeFileSync(meta_path + 'sound_meta.json', JSON.stringify(meta_data));
     }
 
-    try {
-        meta_data = JSON.parse(fs.readFileSync(meta_path + 'sound_meta.json', {encoding: 'utf8'}));
-        path_meta_data = meta_data[fs.realpathSync(data_path)];
-        curSelector.initializeGraph();
-    }
-    catch (err) {
-        console.log('Valid sound metadata not found, generating new...');
-        curSelector.initializeGraph();
-        console.log('[SUCCESS] ' + meta_path + 'sound_meta.json will be created upon server restart. Internal states currently being used.');
-    }
+    // open a connection to the DB
+    db.serialize(function() {
+        db.run("CREATE TABLE IF NOT EXISTS paths( \
+                path_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \
+                path TEXT NOT NULL \
+            )");
+        db.run("CREATE TABLE IF NOT EXISTS nodes( \
+                node_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \
+                full_path TEXT NOT NULL, \
+                FOREIGN KEY(parent_path) REFERENCES paths(path_id) \
+            )");
+        db.run("CREATE TABLE IF NOT EXISTS edges( \
+                edge_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \
+                FOREIGN KEY(start) REFERENCES nodes(node_id), \
+                FOREIGN KEY(end) REFERENCES nodes(node_id), \
+                weight INTEGER NOT NULL \
+            )");
+    });
+    db.initializeGraph();
+
+    // try {
+    //     meta_data = JSON.parse(fs.readFileSync(meta_path + 'sound_meta.json', {encoding: 'utf8'}));
+    //     path_meta_data = meta_data[fs.realpathSync(data_path)];
+    //     curSelector.initializeGraph();
+    // }
+    // catch (err) {
+    //     console.log('Valid sound metadata not found, generating new...');
+    //     curSelector.initializeGraph();
+    //     console.log('[SUCCESS] ' + meta_path + 'sound_meta.json will be created upon server restart. Internal states currently being used.');
+    // }
 }
 
 module.exports = Selector;
