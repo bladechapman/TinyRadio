@@ -58,6 +58,10 @@ function Selector(data, meta_path, data_path) {
         return nodes[name];
     }
     this.addNode = function(name) {
+        db.serialize(function() {
+            db.run("INSERT INTO nodes VALUES(" + name + ")");
+
+        });
         // DB query - change to adding edges
         // var newNode = new Node(name);
         // for (var node_name in nodes) {
@@ -140,14 +144,15 @@ function Selector(data, meta_path, data_path) {
 
     // open a connection to the DB
     db.serialize(function() {
-        db.run("CREATE TABLE IF NOT EXISTS paths( \
-                path_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \
-                path TEXT NOT NULL \
-            )");
+        // db.run("CREATE TABLE IF NOT EXISTS paths( \
+        //         path_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \
+        //         path TEXT NOT NULL \
+        //     )");
         db.run("CREATE TABLE IF NOT EXISTS nodes( \
                 node_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \
+                name TEXT NOT NULL, \
                 full_path TEXT NOT NULL, \
-                FOREIGN KEY(parent_path) REFERENCES paths(path_id) \
+                parent_path TEXT NOT NULL \
             )");
         db.run("CREATE TABLE IF NOT EXISTS edges( \
                 edge_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \
