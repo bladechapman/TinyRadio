@@ -136,4 +136,14 @@ DJ.prototype.dispatchEvent = function(eventName, eventArgs) {
     })
 }
 
+
+/** TEST **/
+var test_dj = new DJ('./sound');
+console.log('GET NODES');
+test_dj.selector.getNodes(function(err, rows) {
+    console.log(rows);
+});
+/** **/
+
+
 module.exports = DJ;
