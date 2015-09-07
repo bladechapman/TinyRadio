@@ -2,18 +2,6 @@ var fs = require('fs');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('tinyradio');
 
-function async_block(limit, async_finally) {
-    var internalCounter = 0;
-    var internalLimit = limit;
-
-    return function() {
-        internalCounter++;
-        if (internalCounter == internalLimit) {
-            async_finally();
-        }
-    }
-}
-
 // takes a list of song names to generate graph
 function Selector(data, meta_path, data_path) {
     console.log(data);
@@ -44,7 +32,6 @@ function Selector(data, meta_path, data_path) {
         }
     }
     this.initializeGraph = function() {
-        // nodes = {};
         if (data) {
             for (var i = 0; i < data.length; i++) {
                 curSelector.addNode(data[i]);
@@ -57,7 +44,7 @@ function Selector(data, meta_path, data_path) {
     this.getLastFile = function() {
         return lastSelected;
     }
-    this.getNodes = function(callback) {
+    this.getNodes = function getNodes(callback) {
         // use DB query to return nodes
         db.all("SELECT * FROM nodes WHERE parent_path = $parent_path", {
             $parent_path: data_path
@@ -69,15 +56,13 @@ function Selector(data, meta_path, data_path) {
             }
         });
     }
-    this.findNode = function(name, callback) {
-        // DB query
-        // return nodes[name];
+    this.findNode = function findNode(name, callback) {
         db.get("SELECT FROM nodes WHERE full_path = $full_path AND parent_path = $parent_path", {
             $full_path: name,
             $parent_path: data_path
         }, function(err, row) {
-            if (err) {return null;}
-            else {return row;}
+            if (err) {callback(err, null);}
+            else {callback(null, row);}
         });
     }
     this.addNode = function(name) {
@@ -130,19 +115,21 @@ function Selector(data, meta_path, data_path) {
             });
         });
     }
-    this.addToQueue = function(name) {
-        if (!(name in nodes)) { return -1; }
-        if ((queue.length > 0 && queue[queue.length - 1] === name) ||
-            (name === currentSelected && queue.length === 0)) {
-            return 0;
-        }
-        if (queue.length > 0) {
-            var last = nodes[queue[queue.length - 1]];
-            if (last.neighbors && last.neighbors[name]) { last.neighbors[name] += 1; }
-        }
-        queue.push(name)
-
-        return 1;
+    this.addToQueue = function(name, callback) {
+        findNode(name, function(err, row) {
+            if (err) {callback(err, -1);}
+            else if (!row || err) {callback(null, -1);}
+            else if ((queue.length > 0 && queue[queue.length - 1].full_path === name) ||
+                (name === currentSelected && queue.length === 0)) {
+                callback(null, 0);
+            }
+            else if (queue.length > 0) {
+                var last = nodes[queue[queue.length - 1]];
+                if (last.neighbors && last.neighbors[name]) { last.neighbors[name] += 1; }
+                queue.push(row)
+                callback(null, 1);
+            }
+        });
     }
     this.removeFromQueue = function() {
         var ret = queue.shift();
@@ -154,23 +141,37 @@ function Selector(data, meta_path, data_path) {
     this.getQueue = function() {
         return queue;
     }
-    this.selectNext = function() {
+    this.selectNext = function(callback) {
         var file;
         if (queue.length !== 0) {
             file = this.removeFromQueue();
+            select_finally(null, file);
         }
         else if (currentSelected === '' || currentSelected === undefined) {    // initially just pick a random node
-            file = nodes[Object.keys(nodes)[parseInt(Math.random() * Object.keys(nodes).length)]].name;
+            db.get("SELECT * FROM nodes WHERE parent_path = $parent_path ORDER BY RANDOM() LIMIT 1", {
+                $parent_path: data_path
+            }, function(err, row) {
+                file = row;
+                select_finally(err, file);
+            });
         }
         else {
-            var originNode = this.findNode(currentSelected);
-            file = sampleWeighted(originNode.neighbors);
+            var originNode = currentSelected;
+            db.all("SELECT * FROM edges WHERE start_node = $start_node_id AS edge \
+                JOIN nodes AS node \
+                ON edge.start_node_id = node.node_id", {
+                $start_node_id: originNode.node_id
+            }, function(err, rows) {
+                file = sampleWeighted(rows);
+                select_finally(err, file);
+            });
         }
 
-        lastSelected = currentSelected;
-        currentSelected = file;
-
-        return file;
+        function select_finally(err, file) {
+            lastSelected = currentSelected;
+            currentSelected = file;
+            callback(err, file);
+        }
     }
     this.rateSelection = function(rating) {
         if (lastSelected && currentSelected) {
@@ -186,17 +187,26 @@ function Selector(data, meta_path, data_path) {
         db.run("CREATE TABLE IF NOT EXISTS nodes ( \
             node_id INTEGER PRIMARY KEY ASC, \
             full_path TEXT NOT NULL, \
-            parent_path TEXT NOT NULL)");
+            parent_path TEXT NOT NULL
+        )");
         db.run("CREATE TABLE IF NOT EXISTS edges( \
-                edge_id INTEGER PRIMARY KEY ASC, \
-                start_node INTEGER NOT NULL, \
-                end_node INTEGER NOT NULL, \
-                weight INTEGER NOT NULL, \
-                FOREIGN KEY(start_node) REFERENCES nodes(node_id), \
-                FOREIGN KEY(end_node) REFERENCES nodes(node_id) \
-            )");
+            edge_id INTEGER PRIMARY KEY ASC, \
+            start_node INTEGER NOT NULL, \
+            end_node INTEGER NOT NULL, \
+            weight INTEGER NOT NULL, \
+            FOREIGN KEY(start_node) REFERENCES nodes(node_id), \
+            FOREIGN KEY(end_node) REFERENCES nodes(node_id) \
+        )");
     });
     curSelector.initializeGraph();
+
+    setTimeout(function() {
+        db.get("SELECT * FROM nodes WHERE parent_path = $parent_path ORDER BY RANDOM() LIMIT 1", {
+            $parent_path: data_path
+        }, function(err, row) {
+            console.log(row);
+        });
+    }, 1000);
 }
 
 module.exports = Selector;
