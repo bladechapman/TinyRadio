@@ -77,8 +77,6 @@ function DJ(path) {
     }
     function findDuration(path, callback) {
         childProcess.exec('ffmpeg -i \"' + path + "\"", function(error, stdout, stderr) {
-            console.log(path);
-
             var dur_string = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
             var dur_string_arr = dur_string.split('.')[0].split(':');
             dur_string_arr.push(dur_string.split('.')[1].substring(0, 2));
@@ -89,7 +87,6 @@ function DJ(path) {
                     parseInt(dur_string_arr[3]));
         })
     }
-
     this.startNextTrack = function(callback) {
         callback = callback || function() {};
         cur_dj.selector.selectNext(function(err, node) {
@@ -114,6 +111,15 @@ function DJ(path) {
             }
         });
     }
+    this.getQueue = function() {
+        return this.selector.getQueue();
+    }
+    this.getCurrentFile = function() {
+        return this.selector.getCurrentFile();
+    }
+    this.getLastFile = function() {
+        return this.selector.getLastFile();
+    }
 }
 DJ.prototype.registerEvent = function(eventName) {
     this.events[eventName] = []  // callbacks are empty
@@ -124,10 +130,6 @@ DJ.prototype.addEventListener = function(eventName, callback) {
 }
 DJ.prototype.removeEventListener = function(eventName, callback) {
     if (!callback || this.events[eventName].indexOf(callback) === -1) { return; }
-    if (this.events[eventName].length >= 2) {
-        console.log(this.events[eventName][0] == this.events[eventName][1]);
-    }
-
     this.events[eventName].splice(this.events[eventName].indexOf(callback), 1);
 }
 DJ.prototype.dispatchEvent = function(eventName, eventArgs) {

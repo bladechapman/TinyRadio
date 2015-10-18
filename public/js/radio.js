@@ -71,11 +71,7 @@ $(function() {
             var songTime = info.servTimestamp - info.songTimestamp;
 
             var elapsedTime = (requestTime + songTime) / 1000;
-
-            console.log('ntp offset: ' + ntp.offset());
-
             temp_source.start(context.currentTime, elapsedTime);
-            console.log('ATTEMPTING START');
 
             if (source) { source.stop(0);}
             source = temp_source;

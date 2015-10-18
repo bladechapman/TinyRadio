@@ -43,21 +43,21 @@ app.use(bodyParser.urlencoded({
     dj.startNextTrack();
     dj.addEventListener('next_song', function() {
         io.emit('app:next_song');
-        io.emit('queue:resp', dj.selector.getQueue());
+        io.emit('queue:resp', dj.getQueue());
     });
 })();
 (function initEndpoints() {
     io.on('connection', function(socket) {
         ntp.sync(socket);
         socket.emit('stations_changed', {'current': (hostname + ':' + port), 'stations': (hostname !== '127.0.0.1') ? apps.all('tiny-radio') : []});
-        socket.emit('queue:resp', dj.selector.getQueue());
+        socket.emit('queue:resp', dj.getQueue());
         setTimeout(function() {
             socket.emit('app:next_song');
         }, 3000);
     });
     app.get('/song', function(req, res) {
         res.set({'Content-Type': 'audio/mpeg'});
-        var readStream = fs.createReadStream(dj.selector.getCurrentFile());
+        var readStream = fs.createReadStream(dj.getCurrentFile());
         readStream.pipe(res);
     });
     app.get('/songs', function(req, res) {
@@ -79,7 +79,7 @@ app.use(bodyParser.urlencoded({
         dj.selector.addToQueue(req.body.name, function(err, status) {
             if (status === 1) {
                 res.json({'message': '[SUCCESS]'});
-                io.emit('queue:resp', dj.selector.getQueue());
+                io.emit('queue:resp', dj.getQueue());
             }
             else if (status === -1) {
                 res.status(400).json({'message': '[ERROR] - Cannot add ' + req.body.name + ' song to queue'});
@@ -93,8 +93,8 @@ app.use(bodyParser.urlencoded({
         res.json({
             songTimestamp: dj.startTimestamp,
             servTimestamp: Date.now(),
-            file: dj.selector.getCurrentFile(),
-            prev: dj.selector.getLastFile()
+            file: dj.getCurrentFile(),
+            prev: dj.getLastFile()
         });
     });
 })();

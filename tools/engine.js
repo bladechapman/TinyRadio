@@ -32,7 +32,7 @@ function Selector(data, meta_path, data_path) {
     this.initializeGraph = function() {
         if (data) {
             for (var i = 0; i < data.length; i++) {
-                curSelector.addNode(data[i]);
+                this.addNode(data[i]);
             }
         }
     }
@@ -108,13 +108,10 @@ function Selector(data, meta_path, data_path) {
             $full_path: name,
             $parent_path: data_path
         }, function(err) {
-            console.log('REMOVE NODE');
             if (err) {return;}
             if (this.changes !== 1) {return;}
 
             var removed_node_id = this.lastID;
-            console.log('lastID: ' + removed_node_id);
-            console.log('changes: ' + this.changes);
 
             db.run("DELETE FROM edges WHERE start_node = $node_id", {
                 $node_id: removed_node_id
@@ -157,12 +154,10 @@ function Selector(data, meta_path, data_path) {
     this.selectNext = function(callback) {
         var file;
         if (queue.length !== 0) {
-            console.log('PICK FROM QUEUE')
             file = this.removeFromQueue();
             select_finally(null, file);
         }
         else if (currentSelected === '' || currentSelected === undefined) {    // initially just pick a random node
-            console.log('PICK RANDOM')
             db.get("SELECT * FROM nodes WHERE parent_path = $parent_path ORDER BY RANDOM() LIMIT 1", {
                 $parent_path: data_path
             }, function(err, row) {
@@ -170,7 +165,6 @@ function Selector(data, meta_path, data_path) {
             });
         }
         else {
-            console.log('PICK WEIGHTED');
             db.all("SELECT * from edges, nodes WHERE edges.start_node = (SELECT node_id FROM nodes WHERE full_path = $start_node_full_path) AND nodes.node_id = edges.end_node", {
                 $start_node_full_path: currentSelected
             }, function(err, rows) {
@@ -189,17 +183,6 @@ function Selector(data, meta_path, data_path) {
             callback(err, file);
         }
     }
-    // this.rateSelection = function(rating) {
-    //     if (lastSelected && currentSelected) {
-    //         db.run("UPDATE edges SET weight = weight + 1 \
-    //             WHERE start_node = $start_node AND end_node = $end_node", {
-    //                 $start_node: lastSelected,
-    //                 $end_node: currentSelected
-    //             })
-    //     } else {
-    //         console.log('Okay! *continues to ignore you*');
-    //     }
-    // }
 
     db.serialize(function() {
         db.run("CREATE TABLE IF NOT EXISTS nodes ( \
@@ -216,7 +199,7 @@ function Selector(data, meta_path, data_path) {
             FOREIGN KEY(end_node) REFERENCES nodes(node_id) \
         )");
     });
-    curSelector.initializeGraph();
+    this.initializeGraph();
 }
 
 module.exports = Selector;
