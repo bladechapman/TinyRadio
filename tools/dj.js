@@ -90,28 +90,27 @@ function DJ(path) {
 
     this.startNextTrack = function(callback) {
         callback = callback || function() {};
-        // for now, just return random
-        // eventually convert this into an LRU cache
-        var file = cur_dj.selector.selectNext();
+        cur_dj.selector.selectNext(function(err, node) {
+            file = node['full_path'];
+            try {
+                findDuration(file, function(duration) {
+                    clearTimeout(timout);
+                    timout = setTimeout(function() {
+                        cur_dj.startNextTrack(function() {});
+                    }, duration + songBuffer);
 
-        try {
-            findDuration(file, function(duration) {
-                clearTimeout(timout);
-                timout = setTimeout(function() {
-                    cur_dj.startNextTrack(function() {});
-                }, duration + songBuffer);
+                    cur_dj.startTimestamp = Date.now();
+                    cur_dj.dispatchEvent('next_song');
 
-                cur_dj.startTimestamp = Date.now();
-                cur_dj.dispatchEvent('next_song');
-
-                callback(file);
-            })
-        }
-        catch(err) {
-            console.log('[ERROR] Cannot read file ' + file + ', trying again');
-            cur_dj.curSelector.removeNode(file);
-            cur_dj.startNextTrack(function() {});
-        }
+                    callback(file);
+                })
+            }
+            catch(err) {
+                console.log('[ERROR] Cannot read file ' + file + ', trying again');
+                cur_dj.curSelector.removeNode(file);
+                cur_dj.startNextTrack(function() {});
+            }
+        });
     }
 }
 DJ.prototype.registerEvent = function(eventName) {
@@ -135,5 +134,6 @@ DJ.prototype.dispatchEvent = function(eventName, eventArgs) {
         callback(eventArgs);
     })
 }
+
 
 module.exports = DJ;
