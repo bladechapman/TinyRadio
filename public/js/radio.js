@@ -77,9 +77,6 @@ $(function() {
 
             if (source) { source.stop(0);}
             source = temp_source;
-            source.onended = function() {
-                console.log('SONG ENDED');
-            }
         });
     }
     function loadSound() {

@@ -61,23 +61,33 @@ app.use(bodyParser.urlencoded({
         readStream.pipe(res);
     });
     app.get('/songs', function(req, res) {
-        res.json({
-            'message': '[SUCCESS]',
-            'data': Object.keys(dj.selector.getNodes())
+        dj.selector.getNodes(function(err, paths) {
+            if (err) {
+                res.json({
+                    'message': '[ERROR]',
+                    'data': null
+                });
+            } else {
+                res.json({
+                    'message': '[SUCCESS]',
+                    'data': paths
+                });
+            }
         });
     });
     app.post('/enqueue', function(req, res) {
-        var status = dj.selector.addToQueue(req.body.name);
-        if (status === 1) {
-            res.json({'message': '[SUCCESS]'});
-            io.emit('queue:resp', dj.selector.getQueue());
-        }
-        else if (status === -1) {
-            res.status(400).json({'message': '[ERROR] - Cannot add ' + req.body.name + ' song to queue'});
-        }
-        else {
-            res.status(400).json({'message': '[ERROR] - The same song cannot be added twice in a row'});
-        }
+        dj.selector.addToQueue(req.body.name, function(err, status) {
+            if (status === 1) {
+                res.json({'message': '[SUCCESS]'});
+                io.emit('queue:resp', dj.selector.getQueue());
+            }
+            else if (status === -1) {
+                res.status(400).json({'message': '[ERROR] - Cannot add ' + req.body.name + ' song to queue'});
+            }
+            else {
+                res.status(400).json({'message': '[ERROR] - The same song cannot be added twice in a row'});
+            }
+        });
     });
     app.get('/info', function(req, res) {
         res.json({
@@ -94,7 +104,6 @@ app.use(bodyParser.urlencoded({
     function gracefulExit() {
         console.log('exiting gracefully');
         apps.stop();
-        dj.selector.saveMetadata();
         process.exit();
     }
 })();

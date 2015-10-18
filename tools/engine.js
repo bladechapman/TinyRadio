@@ -4,8 +4,6 @@ var db = new sqlite3.Database('tinyradio');
 
 // takes a list of song names to generate graph
 function Selector(data, meta_path, data_path) {
-    console.log(data);
-
     var curSelector = this;
     var queue = [];     // NOTE: implementation is lazy - poor performance for large sets
     var lastSelected;
@@ -18,17 +16,17 @@ function Selector(data, meta_path, data_path) {
     function sampleWeighted(weights) {
         list = [];
         accumulation = 0;
-        for (var node in weights) {
-            accumulation += weights[node]
+        weights.forEach(function(edge) {
+            accumulation += edge['weight'];
             list.push({
-                'node' : node,
-                'accumulation' : accumulation
+                'target_node_id': edge['end_node'],
+                'accumulation': accumulation
             })
-        }
+        })
 
         var rand = parseInt(Math.random() * accumulation) + 1;
-        for (var i = 1; i <= list.length; i++) {
-            if (rand <= list[i].accumulation) { return list[i].node}
+        for (var i = 0; i < list.length; i++) {
+            if (rand <= list[i].accumulation) { return list[i].target_node_id}
         }
     }
     this.initializeGraph = function() {
@@ -39,25 +37,28 @@ function Selector(data, meta_path, data_path) {
         }
     }
     this.getCurrentFile = function() {
-        return currentSelected;
+        return (currentSelected) ? currentSelected['full_path'] : null;
     }
     this.getLastFile = function() {
-        return lastSelected;
+        return (lastSelected) ? lastSelected['full_path'] : null;
     }
     this.getNodes = function getNodes(callback) {
         // use DB query to return nodes
-        db.all("SELECT * FROM nodes WHERE parent_path = $parent_path", {
+        db.all("SELECT full_path FROM nodes WHERE parent_path = $parent_path", {
             $parent_path: data_path
         }, function(err, rows) {
             if (err) {
                 callback("Error retrieving nodes", null);
             } else {
-                callback(null, rows);
+                paths = rows.map(function(value) {
+                    return value['full_path'];
+                });
+                callback(null, paths);
             }
         });
     }
     this.findNode = function findNode(name, callback) {
-        db.get("SELECT FROM nodes WHERE full_path = $full_path AND parent_path = $parent_path", {
+        db.get("SELECT * FROM nodes WHERE full_path = $full_path AND parent_path = $parent_path", {
             $full_path: name,
             $parent_path: data_path
         }, function(err, row) {
@@ -73,11 +74,12 @@ function Selector(data, meta_path, data_path) {
             $full_path: name,
             $parent_path: data_path
         }, function(err) {
-            if(err) {return;}
+            if(err || !this.lastID) {return;}
             var added_node_id = this.lastID
             if (!err && added_node_id !== undefined) {
-                db.all("SELECT node_id FROM nodes WHERE parent_path = $parent_path", {
-                    $parent_path: data_path
+                db.all("SELECT node_id FROM nodes WHERE parent_path = $parent_path AND node_id != $added_id", {
+                    $parent_path: data_path,
+                    $added_id: added_node_id
                 }, function(err, rows) {
                     if (err) {return;}
                     rows.forEach(function(existing_node) {
@@ -106,27 +108,38 @@ function Selector(data, meta_path, data_path) {
             $full_path: name,
             $parent_path: data_path
         }, function(err) {
+            console.log('REMOVE NODE');
+            if (err) {return;}
+            if (this.changes !== 1) {return;}
+
             var removed_node_id = this.lastID;
-            db.run("DELETE FROM rows WHERE start_node = $node_id", {
+            console.log('lastID: ' + removed_node_id);
+            console.log('changes: ' + this.changes);
+
+            db.run("DELETE FROM edges WHERE start_node = $node_id", {
                 $node_id: removed_node_id
             });
-            db.run("DELETE FROM rows WHERE end_node = $node_id", {
+            db.run("DELETE FROM edges WHERE end_node = $node_id", {
                 $node_id: removed_node_id
             });
         });
     }
     this.addToQueue = function(name, callback) {
-        findNode(name, function(err, row) {
+        this.findNode(name, function(err, row) {
             if (err) {callback(err, -1);}
             else if (!row || err) {callback(null, -1);}
-            else if ((queue.length > 0 && queue[queue.length - 1].full_path === name) ||
+            else if ((queue.length > 0 && queue[queue.length - 1] === name) ||
                 (name === currentSelected && queue.length === 0)) {
                 callback(null, 0);
             }
-            else if (queue.length > 0) {
-                var last = nodes[queue[queue.length - 1]];
-                if (last.neighbors && last.neighbors[name]) { last.neighbors[name] += 1; }
-                queue.push(row)
+            else {
+                if (queue.length > 0) {
+                    db.run("UPDATE edges SET weight = weight + 1 WHERE start_node = (SELECT node_id FROM nodes WHERE full_path = $start_node_full_path) AND end_node = $end_node_id", {
+                        $start_node_full_path: queue[queue.length - 1],
+                        $end_node_id: row['node_id']
+                    });
+                }
+                queue.push(row['full_path']);
                 callback(null, 1);
             }
         });
@@ -144,26 +157,29 @@ function Selector(data, meta_path, data_path) {
     this.selectNext = function(callback) {
         var file;
         if (queue.length !== 0) {
+            console.log('PICK FROM QUEUE')
             file = this.removeFromQueue();
             select_finally(null, file);
         }
         else if (currentSelected === '' || currentSelected === undefined) {    // initially just pick a random node
+            console.log('PICK RANDOM')
             db.get("SELECT * FROM nodes WHERE parent_path = $parent_path ORDER BY RANDOM() LIMIT 1", {
                 $parent_path: data_path
             }, function(err, row) {
-                file = row;
-                select_finally(err, file);
+                select_finally(err, row);
             });
         }
         else {
+            console.log('PICK WEIGHTED');
             var originNode = currentSelected;
-            db.all("SELECT * FROM edges WHERE start_node = $start_node_id AS edge \
-                JOIN nodes AS node \
-                ON edge.start_node_id = node.node_id", {
-                $start_node_id: originNode.node_id
+            db.all("SELECT * from edges, nodes WHERE edges.start_node = $start_node_id AND nodes.node_id = edges.end_node", {
+                $start_node_id: originNode['node_id']
             }, function(err, rows) {
-                file = sampleWeighted(rows);
-                select_finally(err, file);
+                db.get("SELECT * FROM nodes WHERE node_id = $target_node_id", {
+                    $target_node_id: target_node_id
+                }, function(err, row) {
+                    select_finally(err, row);
+                });
             });
         }
 
@@ -175,9 +191,11 @@ function Selector(data, meta_path, data_path) {
     }
     this.rateSelection = function(rating) {
         if (lastSelected && currentSelected) {
-            var prev = nodes[lastSelected];
-            if (rating === 1) { prev.neighbors[currentSelected] += 1; }
-            else if (rating === 0 && prev.neighbors[currentSelected] >= 2)  { prev.neighbors[currentSelected] -= 1; }
+            db.run("UPDATE edges SET weight = weight + 1 \
+                WHERE start_node = $start_node AND end_node = $end_node", {
+                    $start_node: lastSelected,
+                    $end_node: currentSelected
+                })
         } else {
             console.log('Okay! *continues to ignore you*');
         }
@@ -187,7 +205,7 @@ function Selector(data, meta_path, data_path) {
         db.run("CREATE TABLE IF NOT EXISTS nodes ( \
             node_id INTEGER PRIMARY KEY ASC, \
             full_path TEXT NOT NULL, \
-            parent_path TEXT NOT NULL
+            parent_path TEXT NOT NULL \
         )");
         db.run("CREATE TABLE IF NOT EXISTS edges( \
             edge_id INTEGER PRIMARY KEY ASC, \
@@ -199,14 +217,6 @@ function Selector(data, meta_path, data_path) {
         )");
     });
     curSelector.initializeGraph();
-
-    setTimeout(function() {
-        db.get("SELECT * FROM nodes WHERE parent_path = $parent_path ORDER BY RANDOM() LIMIT 1", {
-            $parent_path: data_path
-        }, function(err, row) {
-            console.log(row);
-        });
-    }, 1000);
 }
 
 module.exports = Selector;
