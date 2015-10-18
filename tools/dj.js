@@ -77,6 +77,8 @@ function DJ(path) {
     }
     function findDuration(path, callback) {
         childProcess.exec('ffmpeg -i \"' + path + "\"", function(error, stdout, stderr) {
+            console.log(path);
+
             var dur_string = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
             var dur_string_arr = dur_string.split('.')[0].split(':');
             dur_string_arr.push(dur_string.split('.')[1].substring(0, 2));
@@ -91,7 +93,7 @@ function DJ(path) {
     this.startNextTrack = function(callback) {
         callback = callback || function() {};
         cur_dj.selector.selectNext(function(err, node) {
-            file = node['full_path'];
+            file = node;
             try {
                 findDuration(file, function(duration) {
                     clearTimeout(timout);

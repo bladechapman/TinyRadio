@@ -37,10 +37,10 @@ function Selector(data, meta_path, data_path) {
         }
     }
     this.getCurrentFile = function() {
-        return (currentSelected) ? currentSelected['full_path'] : null;
+        return (currentSelected) ? currentSelected : null;
     }
     this.getLastFile = function() {
-        return (lastSelected) ? lastSelected['full_path'] : null;
+        return (lastSelected) ? lastSelected : null;
     }
     this.getNodes = function getNodes(callback) {
         // use DB query to return nodes
@@ -166,19 +166,19 @@ function Selector(data, meta_path, data_path) {
             db.get("SELECT * FROM nodes WHERE parent_path = $parent_path ORDER BY RANDOM() LIMIT 1", {
                 $parent_path: data_path
             }, function(err, row) {
-                select_finally(err, row);
+                select_finally(err, row['full_path']);
             });
         }
         else {
             console.log('PICK WEIGHTED');
-            var originNode = currentSelected;
-            db.all("SELECT * from edges, nodes WHERE edges.start_node = $start_node_id AND nodes.node_id = edges.end_node", {
-                $start_node_id: originNode['node_id']
+            db.all("SELECT * from edges, nodes WHERE edges.start_node = (SELECT node_id FROM nodes WHERE full_path = $start_node_full_path) AND nodes.node_id = edges.end_node", {
+                $start_node_full_path: currentSelected
             }, function(err, rows) {
+                target_node_id = sampleWeighted(rows);
                 db.get("SELECT * FROM nodes WHERE node_id = $target_node_id", {
                     $target_node_id: target_node_id
                 }, function(err, row) {
-                    select_finally(err, row);
+                    select_finally(err, row['full_path']);
                 });
             });
         }
@@ -189,17 +189,17 @@ function Selector(data, meta_path, data_path) {
             callback(err, file);
         }
     }
-    this.rateSelection = function(rating) {
-        if (lastSelected && currentSelected) {
-            db.run("UPDATE edges SET weight = weight + 1 \
-                WHERE start_node = $start_node AND end_node = $end_node", {
-                    $start_node: lastSelected,
-                    $end_node: currentSelected
-                })
-        } else {
-            console.log('Okay! *continues to ignore you*');
-        }
-    }
+    // this.rateSelection = function(rating) {
+    //     if (lastSelected && currentSelected) {
+    //         db.run("UPDATE edges SET weight = weight + 1 \
+    //             WHERE start_node = $start_node AND end_node = $end_node", {
+    //                 $start_node: lastSelected,
+    //                 $end_node: currentSelected
+    //             })
+    //     } else {
+    //         console.log('Okay! *continues to ignore you*');
+    //     }
+    // }
 
     db.serialize(function() {
         db.run("CREATE TABLE IF NOT EXISTS nodes ( \
