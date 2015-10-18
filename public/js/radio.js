@@ -39,9 +39,9 @@ $(function() {
         });
         socket.on('queue:resp', function(queued_songs) {
             $('.two').html(filterFilename(queued_songs[0] || ''));
-            $('.three').html(filterFilename(queued_songs[1] || ''))
+            $('.three').html(filterFilename(queued_songs[1] || ''));
             $('.four').html(filterFilename(queued_songs[2] || ''));
-            $('.five').html(filterFilename(queued_songs[3] || ''))
+            $('.five').html(filterFilename(queued_songs[3] || ''));
         });
     })();
 
@@ -73,7 +73,7 @@ $(function() {
             var elapsedTime = (requestTime + songTime) / 1000;
             temp_source.start(context.currentTime, elapsedTime);
 
-            if (source) { source.stop(0);}
+            if (source) { source.stop(0); }
             source = temp_source;
         });
     }

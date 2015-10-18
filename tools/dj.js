@@ -2,7 +2,7 @@ var fs = require('fs');
 var childProcess = require('child_process');
 var recursiveReaddirSync = require('recursive-readdir-sync');
 var chok = require('chokidar');
-var Selector = require('./engine');
+var Selector = require('./selector');
 
 function DJ(path) {
     var cur_dj = this;
@@ -95,7 +95,7 @@ function DJ(path) {
                 findDuration(file, function(duration) {
                     clearTimeout(timout);
                     timout = setTimeout(function() {
-                        cur_dj.startNextTrack(function() {});
+                        cur_dj.startNextTrack();
                     }, duration + songBuffer);
 
                     cur_dj.startTimestamp = Date.now();
@@ -107,7 +107,7 @@ function DJ(path) {
             catch(err) {
                 console.log('[ERROR] Cannot read file ' + file + ', trying again');
                 cur_dj.curSelector.removeNode(file);
-                cur_dj.startNextTrack(function() {});
+                cur_dj.startNextTrack();
             }
         });
     }
@@ -122,7 +122,7 @@ function DJ(path) {
     }
 }
 DJ.prototype.registerEvent = function(eventName) {
-    this.events[eventName] = []  // callbacks are empty
+    this.events[eventName] = [];  // callbacks are empty
 }
 DJ.prototype.addEventListener = function(eventName, callback) {
     if (!this.events[eventName]) { return; }

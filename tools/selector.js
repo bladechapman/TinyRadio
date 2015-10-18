@@ -10,7 +10,7 @@ function Selector(data, meta_path, data_path) {
     var currentSelected;
     var meta_data = {};
     var path_meta_data = {};
-    var initial_ranking = 5;
+    var initial_ranking = 1;
     meta_path = meta_path || './';
 
     function sampleWeighted(weights) {
