@@ -113,7 +113,7 @@ http.listen(port, hostname, function() {
 
     apps.put({
         'name': 'tiny-radio',
-        'port': port,
+        'port': port
     });
     apps.on('up', function() {
         io.emit('stations_changed', {'current': (hostname + port), 'stations': apps.all('tiny-radio')});

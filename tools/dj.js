@@ -16,10 +16,11 @@ function DJ(path) {
     };
     this.path = path;
     this.startTimestamp = 0;
-    this.events = {}    // name, callbacks
-    this.selector = new Selector(filterDirectory(this.path), undefined, this.path);
+    this.events = {};    // name, callbacks
+    this.selector = new Selector(filterDirectory(this.path), this.path);
 
     this.registerEvent('next_song');
+    this.registerEvent('songlist_change');  // TODO: dispatch this event on file change, catch event
 
     watcher = chok.watch(path, {
         'persistent': true,
@@ -110,34 +111,34 @@ function DJ(path) {
                 cur_dj.startNextTrack();
             }
         });
-    }
+    };
     this.getQueue = function() {
         return this.selector.getQueue();
-    }
+    };
     this.getCurrentFile = function() {
         return this.selector.getCurrentFile();
-    }
+    };
     this.getLastFile = function() {
         return this.selector.getLastFile();
-    }
+    };
 }
 DJ.prototype.registerEvent = function(eventName) {
     this.events[eventName] = [];  // callbacks are empty
-}
+};
 DJ.prototype.addEventListener = function(eventName, callback) {
     if (!this.events[eventName]) { return; }
     this.events[eventName].push(callback);
-}
+};
 DJ.prototype.removeEventListener = function(eventName, callback) {
     if (!callback || this.events[eventName].indexOf(callback) === -1) { return; }
     this.events[eventName].splice(this.events[eventName].indexOf(callback), 1);
-}
+};
 DJ.prototype.dispatchEvent = function(eventName, eventArgs) {
     if (!this.events[eventName]) { return;}
     this.events[eventName].forEach(function(callback) {
         callback(eventArgs);
     })
-}
+};
 
 
 module.exports = DJ;

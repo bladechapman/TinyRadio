@@ -1,28 +1,22 @@
-var fs = require('fs');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('tinyradio');
 
 // takes a list of song names to generate graph
-function Selector(data, meta_path, data_path) {
-    var curSelector = this;
+function Selector(data, data_path) {
     var queue = [];     // NOTE: implementation is lazy - poor performance for large sets
     var lastSelected;
     var currentSelected;
-    var meta_data = {};
-    var path_meta_data = {};
-    var initial_ranking = 1;
-    meta_path = meta_path || './';
 
     function sampleWeighted(weights) {
-        list = [];
-        accumulation = 0;
+        var list = [];
+        var accumulation = 0;
         weights.forEach(function(edge) {
             accumulation += edge['weight'];
             list.push({
                 'target_node_id': edge['end_node'],
                 'accumulation': accumulation
             })
-        })
+        });
 
         var rand = parseInt(Math.random() * accumulation) + 1;
         for (var i = 0; i < list.length; i++) {
@@ -35,13 +29,13 @@ function Selector(data, meta_path, data_path) {
                 this.addNode(data[i]);
             }
         }
-    }
+    };
     this.getCurrentFile = function() {
         return (currentSelected) ? currentSelected : null;
-    }
+    };
     this.getLastFile = function() {
         return (lastSelected) ? lastSelected : null;
-    }
+    };
     this.getNodes = function getNodes(callback) {
         // use DB query to return nodes
         db.all("SELECT full_path FROM nodes WHERE parent_path = $parent_path", {
@@ -56,7 +50,7 @@ function Selector(data, meta_path, data_path) {
                 callback(null, paths);
             }
         });
-    }
+    };
     this.findNode = function findNode(name, callback) {
         db.get("SELECT * FROM nodes WHERE full_path = $full_path AND parent_path = $parent_path", {
             $full_path: name,
@@ -65,9 +59,8 @@ function Selector(data, meta_path, data_path) {
             if (err) {callback(err, null);}
             else {callback(null, row);}
         });
-    }
+    };
     this.addNode = function(name) {
-        var lastId;
         db.run("INSERT INTO nodes SELECT NULL, $full_path, $parent_path \
             WHERE NOT EXISTS \
             (SELECT 1 FROM nodes WHERE full_path = $full_path AND parent_path = $parent_path)", {
@@ -101,7 +94,7 @@ function Selector(data, meta_path, data_path) {
                 });
             }
         });
-    }
+    };
     this.removeNode = function(name) {
         // DB query
         db.run("DELETE FROM nodes WHERE full_path = $full_path AND parent_path = $parent_path", {
@@ -120,7 +113,7 @@ function Selector(data, meta_path, data_path) {
                 $node_id: removed_node_id
             });
         });
-    }
+    };
     this.addToQueue = function(name, callback) {
         this.findNode(name, function(err, row) {
             if (err) {callback(err, -1);}
@@ -140,17 +133,17 @@ function Selector(data, meta_path, data_path) {
                 callback(null, 1);
             }
         });
-    }
+    };
     this.removeFromQueue = function() {
         var ret = queue.shift();
         return ret;
-    }
+    };
     this.peekInQueue = function() {
         return queue[0];
-    }
+    };
     this.getQueue = function() {
         return queue;
-    }
+    };
     this.selectNext = function(callback) {
         var file;
         if (queue.length !== 0) {
@@ -182,7 +175,7 @@ function Selector(data, meta_path, data_path) {
             currentSelected = file;
             callback(err, file);
         }
-    }
+    };
 
     db.serialize(function() {
         db.run("CREATE TABLE IF NOT EXISTS nodes ( \

@@ -7,6 +7,6 @@ exports.sync = function(socket) {
         socket.emit('ntp:server_ticket', {
             'server_ping' : Date.now(),
             'client_ping' : data.client_ping
-        })
-    })
-}
+        });
+    });
+};
