@@ -16,7 +16,7 @@ $(function() {
                 $(element).removeClass(classname);
 
                 // circular dependency is resolved by the async nature of removeAnimation
-                interval = setTimeout(removeAnimation, animation_duration);
+                var interval = setTimeout(removeAnimation, animation_duration);
                 function removeAnimation() {
                     $(element).removeClass('animate');
                     intervals[element] = null;
@@ -27,7 +27,7 @@ $(function() {
         }
     })();
     function filterSongs(sub) {
-        var ret = []
+        var ret = [];
         songs.forEach(function(title) {
             if (title.toLowerCase().indexOf(sub.toLowerCase()) !== -1) {
                 ret.push(title);
@@ -35,7 +35,25 @@ $(function() {
         });
         return ret;
     }
-    (function initData() {
+    function updateList() {
+        var $search = $('#search');
+        var $list = $('.list');
+
+        if ($search.val().length === 0) {
+            $('.list').removeClass('expanded');
+        }
+        else {
+            $list.empty();
+            $list.addClass('expanded');
+            filtered_songs = filterSongs($('#search').val());
+            filtered_songs.forEach(function(songname, index) {
+                $('.list').append('<div class="list_item" index="' + index + '">' + window.filterFilename(songname) + '</div>');
+            });
+        }
+    }
+    (function initData(callback) {
+        callback = callback || function(){};
+
         var songsReq = new XMLHttpRequest();
         songsReq.open('GET', '/songs', true);
         songsReq.responseType = 'json';
@@ -43,22 +61,16 @@ $(function() {
         songsReq.onreadystatechange = function() {
             if (songsReq.readyState == 4 && songsReq.status == 200) {
                 songs = songsReq.response.data;
+                callback();
             }
-        }
+        };
+        window.app_socket.on('songlist_change', function() {
+            initData(updateList);
+        });
     })();
-    $('#search').on('keyup', function() {
-        if ($('#search').val().length === 0) {
-            $('.list').removeClass('expanded');
-        }
-        else {
-            $('.list').empty();
-            $('.list').addClass('expanded');
-            filtered_songs = filterSongs($('#search').val());
-            filtered_songs.forEach(function(songname, index) {
-                $('.list').append('<div class="list_item" index="' + index + '">' + window.filterFilename(songname) + '</div>');
-            });
-        }
-    });
+
+
+    $('#search').on('keyup', updateList);
     $('.list').click(function(event) {
         var index = event.target.attributes['index'].value;
         $('#search').focus();

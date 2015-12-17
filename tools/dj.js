@@ -40,9 +40,10 @@ function DJ(path) {
                     cur_dj.selector.addNode(element);
                 });
             }
+            cur_dj.dispatchEvent('songlist_change');
         });
     });
-    watcher.on('error', function(error) {
+    watcher.on('error', function(err) {
         console.log('Error watching files');
         console.log(err);
         console.log('exiting gracefully');

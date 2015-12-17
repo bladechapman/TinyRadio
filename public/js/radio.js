@@ -4,12 +4,11 @@ $(function() {
     var context = new AudioContext();
     var socket = io();
     var source;
-    var serverOffset;
-    var serv_mutex = false;
+    var server_mutex = false;
     setInterval(loadSound, 60000); // set refresh rate for sound to auto-resync
 
     $('.mobile_activate').click(function() {
-        oscillator = context.createOscillator();
+        var oscillator = context.createOscillator();
         oscillator.connect(context.destination);
         oscillator.start(0);
         oscillator.stop(0.01);
@@ -17,6 +16,7 @@ $(function() {
         loadSound();
     });
     (function init_io() {
+        window.app_socket = socket; // for use in interaction.js
         ntp.init(socket, {
             interval : 333,
             decay : 0,
@@ -25,7 +25,7 @@ $(function() {
         });
         socket.on('app:next_song', function() {
             loadSound();
-        })
+        });
         socket.on('stations_changed', function(info) {
             var new_stations = info.stations;
             var current = info.current;
@@ -57,11 +57,11 @@ $(function() {
         }
     }
     function process(data, info) {
-        var filename = filterFilename(info.file)
+        var filename = filterFilename(info.file);
         $('.songname').html(filename);
         document.title = "TinyRadio: " + filename;
 
-        var temp_source = context.createBufferSource()
+        var temp_source = context.createBufferSource();
         context.decodeAudioData(data, function(decoded) {
             temp_source.buffer = decoded;
             temp_source.connect(context.destination);    // connect to whatever is rendering the audio (speakers in this case)
@@ -78,8 +78,8 @@ $(function() {
         });
     }
     function loadSound() {
-        if (serv_mutex) { return; }
-        serv_mutex = true;
+        if (server_mutex) { return; }
+        server_mutex = true;
 
         var infoReq = new XMLHttpRequest();
         infoReq.open('GET', '/info', true);
@@ -96,13 +96,13 @@ $(function() {
         var info;
         var asyncNetwork = async(2, function() {
             process(data, infoReq.response);
-            serv_mutex = false;
-        })
+            server_mutex = false;
+        });
 
         songReq.onload = function() {
             data = songReq.response;
             asyncNetwork();
-        }
+        };
         infoReq.onreadystatechange = function() {
             if (infoReq.readyState == 4 && infoReq.status == 200) {
                 info = infoReq.response;
@@ -114,7 +114,7 @@ $(function() {
         var ext_arr = file.split('.');
         var ext = ext_arr.slice(0, ext_arr.length - 1).join();
         var path_arr = ext.split('/');
-        var file = path_arr.slice(path_arr.length -1, path_arr.length).join();
+        file = path_arr.slice(path_arr.length -1, path_arr.length).join();
 
         file = file.replace(/\\\s/g, ' ');
         file = file.replace(/\\\(/g, '(');

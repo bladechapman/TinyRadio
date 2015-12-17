@@ -45,6 +45,9 @@ app.use(bodyParser.urlencoded({
         io.emit('app:next_song');
         io.emit('queue:resp', dj.getQueue());
     });
+    dj.addEventListener('songlist_change', function() {
+        io.emit('songlist_change');
+    });
 })();
 (function initEndpoints() {
     io.on('connection', function(socket) {
