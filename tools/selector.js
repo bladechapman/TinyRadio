@@ -44,7 +44,7 @@ function Selector(data, data_path) {
             if (err) {
                 callback("Error retrieving nodes", null);
             } else {
-                paths = rows.map(function(value) {
+                var paths = rows.map(function(value) {
                     return value['full_path'];
                 });
                 callback(null, paths);
@@ -135,8 +135,7 @@ function Selector(data, data_path) {
         });
     };
     this.removeFromQueue = function() {
-        var ret = queue.shift();
-        return ret;
+        return queue.shift();
     };
     this.peekInQueue = function() {
         return queue[0];

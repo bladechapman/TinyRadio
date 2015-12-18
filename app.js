@@ -112,7 +112,7 @@ app.use(bodyParser.urlencoded({
 })();
 
 http.listen(port, hostname, function() {
-    console.log('listening at IP: ' + hostname + ':' + port);
+    console.log('Radio broadcasting at: ' + hostname + ':' + port);
 
     apps.put({
         'name': 'tiny-radio',

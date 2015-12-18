@@ -20,14 +20,14 @@ function DJ(path) {
     this.selector = new Selector(filterDirectory(this.path), this.path);
 
     this.registerEvent('next_song');
-    this.registerEvent('songlist_change');  // TODO: dispatch this event on file change, catch event
+    this.registerEvent('songlist_change');
 
-    watcher = chok.watch(path, {
+    var watcher = chok.watch(path, {
         'persistent': true,
         'usePolling': false
     });
-    watcher.on('ready', function(event, path) {
-        watcher.on('all', function(event, path) {;
+    watcher.on('ready', function() {
+        watcher.on('all', function(event, path) {
             if (event === 'unlink') {
                 cur_dj.selector.removeNode(path);
             }
@@ -35,7 +35,7 @@ function DJ(path) {
                 cur_dj.selector.addNode(path);
             }
             else if (event === 'addDir') {
-                files = recursiveReaddirSync(path);
+                var files = recursiveReaddirSync(path);
                 files.forEach(function(element) {
                     cur_dj.selector.addNode(element);
                 });
@@ -92,7 +92,7 @@ function DJ(path) {
     this.startNextTrack = function(callback) {
         callback = callback || function() {};
         cur_dj.selector.selectNext(function(err, node) {
-            file = node;
+            var file = node;
             try {
                 findDuration(file, function(duration) {
                     clearTimeout(timout);

@@ -1,6 +1,8 @@
 $(function() {
     var songs = [];
     var filtered_songs = [];
+    var $search = $('#search');
+    var $list = $('.list');
 
     var flashAnimation = (function flashAnimationGenerator() {
         var intervals = {};
@@ -36,16 +38,13 @@ $(function() {
         return ret;
     }
     function updateList() {
-        var $search = $('#search');
-        var $list = $('.list');
-
         if ($search.val().length === 0) {
             $('.list').removeClass('expanded');
         }
         else {
             $list.empty();
             $list.addClass('expanded');
-            filtered_songs = filterSongs($('#search').val());
+            filtered_songs = filterSongs($search.val());
             filtered_songs.forEach(function(songname, index) {
                 $('.list').append('<div class="list_item" index="' + index + '">' + window.filterFilename(songname) + '</div>');
             });
@@ -70,8 +69,8 @@ $(function() {
     })();
 
 
-    $('#search').on('keyup', updateList);
-    $('.list').click(function(event) {
+    $search.on('keyup', updateList);
+    $list.click(function(event) {
         var index = event.target.attributes['index'].value;
         $('#search').focus();
 
@@ -84,7 +83,7 @@ $(function() {
             success: function() {
                 flashAnimation(event.target, 'success');
             },
-            error: function(err) {
+            error: function() {
                 flashAnimation(event.target, 'failure');
             }
         });

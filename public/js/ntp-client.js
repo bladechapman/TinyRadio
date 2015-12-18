@@ -27,7 +27,7 @@
                 offsets.pop();
             }
         })
-    }
+    };
 
     ntp.offset = function() {
         var offset_sum = 0;
@@ -36,7 +36,7 @@
         }
 
         return (offset_sum/(offsets.length || 1));
-    }
+    };
 
 
     root.ntp = ntp;
