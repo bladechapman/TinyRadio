@@ -109,8 +109,14 @@ app.use(bodyParser.urlencoded({
     });
 })();
 (function initExit() {
-    process.on('SIGTERM', gracefulExit);
-    process.on('SIGINT', gracefulExit);
+    process.on('SIGTERM', function() {
+        console.log('SIGTERM');
+        gracefulExit();
+    });
+    process.on('SIGINT', function() {
+        console.log('SIGINT');
+        gracefulExit();
+    });
     function gracefulExit() {
         console.log('exiting gracefully');
         apps.stop();

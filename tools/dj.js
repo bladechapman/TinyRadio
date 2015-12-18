@@ -92,6 +92,7 @@ function DJ(path) {
                 parseInt(dur_string_arr[3]));
             } catch(err) {
                 console.log('[ERROR] Cannot read file ' + path + ', trying again');
+                cur_dj.selector.resetCurrentFile(); // switch to random and try again
                 cur_dj.selector.removeNode(path);
                 cur_dj.startNextTrack();
             }
