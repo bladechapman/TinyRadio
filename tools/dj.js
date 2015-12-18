@@ -30,6 +30,9 @@ function DJ(path) {
         watcher.on('all', function(event, path) {
             if (event === 'unlink') {
                 cur_dj.selector.removeNode(path);
+                if (cur_dj.selector.getCurrentFile() == path) {
+                    cur_dj.startNextTrack();
+                }
             }
             else if (event === 'add') {
                 cur_dj.selector.addNode(path);
@@ -47,7 +50,6 @@ function DJ(path) {
         console.log('Error watching files');
         console.log(err);
         console.log('exiting gracefully');
-        cur_dj.selector.saveMetadata();
         process.exit();
     });
 
@@ -79,38 +81,37 @@ function DJ(path) {
     }
     function findDuration(path, callback) {
         childProcess.exec('ffmpeg -i \"' + path + "\"", function(error, stdout, stderr) {
-            var dur_string = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
-            var dur_string_arr = dur_string.split('.')[0].split(':');
-            dur_string_arr.push(dur_string.split('.')[1].substring(0, 2));
+            try {
+                var dur_string = (stdout + stderr).split('Duration: ')[1].split(', start: ')[0];
+                var dur_string_arr = dur_string.split('.')[0].split(':');
+                dur_string_arr.push(dur_string.split('.')[1].substring(0, 2));
 
-            callback(parseInt(dur_string_arr[0]) * 360 * 1000 +
-                    parseInt(dur_string_arr[1]) * 60 * 1000 +
-                    parseInt(dur_string_arr[2]) * 1000 +
-                    parseInt(dur_string_arr[3]));
-        })
+                callback(parseInt(dur_string_arr[0]) * 360 * 1000 +
+                parseInt(dur_string_arr[1]) * 60 * 1000 +
+                parseInt(dur_string_arr[2]) * 1000 +
+                parseInt(dur_string_arr[3]));
+            } catch(err) {
+                console.log('[ERROR] Cannot read file ' + path + ', trying again');
+                cur_dj.selector.removeNode(path);
+                cur_dj.startNextTrack();
+            }
+        });
     }
     this.startNextTrack = function(callback) {
         callback = callback || function() {};
         cur_dj.selector.selectNext(function(err, node) {
             var file = node;
-            try {
-                findDuration(file, function(duration) {
-                    clearTimeout(timout);
-                    timout = setTimeout(function() {
-                        cur_dj.startNextTrack();
-                    }, duration + songBuffer);
+            findDuration(file, function(duration) {
+                clearTimeout(timout);
+                timout = setTimeout(function() {
+                    cur_dj.startNextTrack();
+                }, duration + songBuffer);
 
-                    cur_dj.startTimestamp = Date.now();
-                    cur_dj.dispatchEvent('next_song');
+                cur_dj.startTimestamp = Date.now();
+                cur_dj.dispatchEvent('next_song');
 
-                    callback(file);
-                })
-            }
-            catch(err) {
-                console.log('[ERROR] Cannot read file ' + file + ', trying again');
-                cur_dj.curSelector.removeNode(file);
-                cur_dj.startNextTrack();
-            }
+                callback(file);
+            });
         });
     };
     this.getQueue = function() {
@@ -138,7 +139,7 @@ DJ.prototype.dispatchEvent = function(eventName, eventArgs) {
     if (!this.events[eventName]) { return;}
     this.events[eventName].forEach(function(callback) {
         callback(eventArgs);
-    })
+    });
 };
 
 

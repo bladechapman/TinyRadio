@@ -109,11 +109,13 @@ $(function() {
         var index = event.target.attributes['index'].value;
         $('#search').focus();
 
+        var songName = (expanded && $search.val().length === 0) ? songs[index] : filtered_songs[index];
+
         $.ajax({
             type: 'POST',
             url: '/enqueue',
             data: {
-                'name': filtered_songs[index]
+                'name': songName
             },
             success: function() {
                 flashAnimation(event.target, 'success');

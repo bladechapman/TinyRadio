@@ -6,6 +6,7 @@ function Selector(data, data_path) {
     var queue = [];     // NOTE: implementation is lazy - poor performance for large sets
     var lastSelected;
     var currentSelected;
+    var currentSelector = this;
 
     function sampleWeighted(weights) {
         var list = [];
@@ -33,10 +34,14 @@ function Selector(data, data_path) {
     this.getCurrentFile = function() {
         return (currentSelected) ? currentSelected : null;
     };
+    this.resetCurrentFile = function() {
+        currentSelected = undefined;
+        lastSelected = undefined;
+    };
     this.getLastFile = function() {
         return (lastSelected) ? lastSelected : null;
     };
-    this.getNodes = function getNodes(callback) {
+    this.getNodes = function(callback) {
         // use DB query to return nodes
         db.all("SELECT full_path FROM nodes WHERE parent_path = $parent_path", {
             $parent_path: data_path
@@ -51,7 +56,7 @@ function Selector(data, data_path) {
             }
         });
     };
-    this.findNode = function findNode(name, callback) {
+    this.findNode = function(name, callback) {
         db.get("SELECT * FROM nodes WHERE full_path = $full_path AND parent_path = $parent_path", {
             $full_path: name,
             $parent_path: data_path
@@ -68,7 +73,7 @@ function Selector(data, data_path) {
             $parent_path: data_path
         }, function(err) {
             if(err || !this.lastID) {return;}
-            var added_node_id = this.lastID
+            var added_node_id = this.lastID;
             if (!err && added_node_id !== undefined) {
                 db.all("SELECT node_id FROM nodes WHERE parent_path = $parent_path AND node_id != $added_id", {
                     $parent_path: data_path,
@@ -144,8 +149,8 @@ function Selector(data, data_path) {
         return queue;
     };
     this.selectNext = function(callback) {
-        var file;
         if (queue.length !== 0) {
+            var file;
             file = this.removeFromQueue();
             select_finally(null, file);
         }
@@ -153,18 +158,29 @@ function Selector(data, data_path) {
             db.get("SELECT * FROM nodes WHERE parent_path = $parent_path ORDER BY RANDOM() LIMIT 1", {
                 $parent_path: data_path
             }, function(err, row) {
-                select_finally(err, row['full_path']);
+                if (err || !row) {
+                    console.log("Unable to select a song! Are you sure there's music here?");
+                    console.log('exiting gracefully');
+                    process.exit();
+                } else {
+                    select_finally(err, row['full_path']);
+                }
             });
         }
         else {
             db.all("SELECT * from edges, nodes WHERE edges.start_node = (SELECT node_id FROM nodes WHERE full_path = $start_node_full_path) AND nodes.node_id = edges.end_node", {
                 $start_node_full_path: currentSelected
             }, function(err, rows) {
-                target_node_id = sampleWeighted(rows);
+                var target_node_id = sampleWeighted(rows);
                 db.get("SELECT * FROM nodes WHERE node_id = $target_node_id", {
                     $target_node_id: target_node_id
                 }, function(err, row) {
-                    select_finally(err, row['full_path']);
+                    if (err || !row) {
+                        currentSelector.resetCurrentFile(); // switch to random and try again
+                        currentSelector.selectNext(callback);
+                    } else {
+                        select_finally(err, row['full_path']);
+                    }
                 });
             });
         }

@@ -59,9 +59,16 @@ app.use(bodyParser.urlencoded({
         }, 3000);
     });
     app.get('/song', function(req, res) {
-        res.set({'Content-Type': 'audio/mpeg'});
-        var readStream = fs.createReadStream(dj.getCurrentFile());
-        readStream.pipe(res);
+        try {
+            res.set({'Content-Type': 'audio/mpeg'});
+            var readStream = fs.createReadStream(dj.getCurrentFile());
+            readStream.pipe(res);
+        } catch(err) {
+            res.json({
+               'message': '[ERROR]',
+                'data': null
+            });
+        }
     });
     app.get('/songs', function(req, res) {
         dj.selector.getNodes(function(err, paths) {
