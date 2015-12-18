@@ -2,6 +2,8 @@
   <img src="http://i.imgur.com/yH85vgu.png"/>
 </p>
 <h1 align="center">TinyRadio</h1>
-<h5 align="center">An internet radio, just for you.</h5>
+<p align="center">An internet radio for you and your friends.</p>
 
-[img][/img]
+<h3>What is TinyRadio?</h3>
+
+<h3>Starting your own radio</h3>
