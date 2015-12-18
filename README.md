@@ -4,6 +4,12 @@
 <h1 align="center">TinyRadio</h1>
 <p align="center">An internet radio for you and your friends.</p>
 
-<h3>What is TinyRadio?</h3>
+## What is TinyRadio?
 
-<h3>Starting your own radio</h3>
+## Starting your own radio
+### Setup
+### Usage
+
+## Troubleshooting
+
+
