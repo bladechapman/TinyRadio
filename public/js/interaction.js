@@ -1,8 +1,10 @@
 $(function() {
     var songs = [];
     var filtered_songs = [];
+    var expanded = false;
     var $search = $('#search');
     var $list = $('.list');
+    var $circle = $('.circle');
 
     var flashAnimation = (function flashAnimationGenerator() {
         var intervals = {};
@@ -37,19 +39,6 @@ $(function() {
         });
         return ret;
     }
-    function updateList() {
-        if ($search.val().length === 0) {
-            $('.list').removeClass('expanded');
-        }
-        else {
-            $list.empty();
-            $list.addClass('expanded');
-            filtered_songs = filterSongs($search.val());
-            filtered_songs.forEach(function(songname, index) {
-                $('.list').append('<div class="list_item" index="' + index + '">' + window.filterFilename(songname) + '</div>');
-            });
-        }
-    }
     (function initData(callback) {
         callback = callback || function(){};
 
@@ -67,10 +56,56 @@ $(function() {
             initData(updateList);
         });
     })();
+    function updateList() {
+        if ($search.val().length === 0) {
+            if (expanded) {
+                expandAll();
+            } else {
+                collapseList();
+            }
+        }
+        else {
+            expandFilter();
+        }
+    }
+    $circle.click(function() {
+        if (expanded) {
+            $circle.removeClass('collapsed');
+            expanded = false;
+            updateList();
+        } else {
+            $circle.addClass('collapsed');
+            expanded = true;
+            if ($search.val().length === 0) {
+                expandAll();
+            } else {
+                expandFilter();
+            }
+        }
+    });
 
+    function collapseList() {
+        $list.removeClass('expanded');
+    }
+    function expandAll() {
+        $list.empty();
+        $list.addClass('expanded');
+        songs.forEach(function(songname, index) {
+            $('.list').append('<div class="list_item" index="' + index + '">' + window.filterFilename(songname) + '</div>');
+        });
+    }
+    function expandFilter() {
+        $list.empty();
+        $list.addClass('expanded');
+        filtered_songs = filterSongs($search.val());
+        filtered_songs.forEach(function(songname, index) {
+            $('.list').append('<div class="list_item" index="' + index + '">' + window.filterFilename(songname) + '</div>');
+        });
+    }
 
     $search.on('keyup', updateList);
     $list.click(function(event) {
+        if (!event.target.attributes['index']) { return; }
         var index = event.target.attributes['index'].value;
         $('#search').focus();
 
