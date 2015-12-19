@@ -38,6 +38,7 @@ $ Radio broadcasting at: 127.0.0.1:8000
  - Multiple servers broadcasting on the same local area network can see each other. To see other stations, hover over the listed IP in the client. Other server IPs will be listed in the drop down if present.
  - Music streaming is synchronized over LAN across multiple clients
  - Patterns of enqueued songs are learned to inform song selection when no music is queued up
+ - File watching
 
 
 ## Troubleshooting
