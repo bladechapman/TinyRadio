@@ -94,6 +94,7 @@ function DJ(path) {
                 console.log('[ERROR] Cannot read file ' + path + ', trying again');
                 cur_dj.selector.resetCurrentFile(); // switch to random and try again
                 cur_dj.selector.removeNode(path);
+                cur_dj.dispatchEvent('songlist_change');
                 cur_dj.startNextTrack();
             }
         });

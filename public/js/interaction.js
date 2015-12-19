@@ -39,7 +39,7 @@ $(function() {
         });
         return ret;
     }
-    (function initData(callback) {
+    function initData(callback) {
         callback = callback || function(){};
 
         var songsReq = new XMLHttpRequest();
@@ -52,10 +52,8 @@ $(function() {
                 callback();
             }
         };
-        window.app_socket.on('songlist_change', function() {
-            initData(updateList);
-        });
-    })();
+    }
+    initData();
     function updateList() {
         if ($search.val().length === 0) {
             if (expanded) {
@@ -129,5 +127,9 @@ $(function() {
         $('.stations').addClass('expanded');
     }, function() {
         $('.stations').removeClass('expanded');
+    });
+
+    window.app_socket.on('songlist_change', function() {
+        initData(updateList);
     });
 });
