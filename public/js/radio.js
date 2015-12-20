@@ -5,6 +5,7 @@ $(function() {
     var socket = io();
     var source;
     var server_mutex = false;
+    loadSound();
     setInterval(loadSound, 60000); // set refresh rate for sound to auto-resync
 
     $('.mobile_activate').click(function() {
