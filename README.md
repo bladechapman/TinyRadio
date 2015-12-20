@@ -5,7 +5,7 @@
 <p align="center">An internet radio for you and your friends</p>
 
 ## What is TinyRadio?
-TinyRadio is a distributed, synchronized music streaming application designed to help you share your music. Just point TinyRadio to the music you'd like to broadcast, start the server, and listen in over your local area network (LAN). Every listening client will be synchronized, so feel free to pump up the volume and listen together, or jam out silent disco style.
+TinyRadio is a distributed, synchronized Web Audio experiment designed to help you share your music. Just point TinyRadio to the music you'd like to broadcast, start the server, and listen in over your local area network (LAN). Every listening client will be synchronized, so feel free to pump up the volume and listen together, or jam out silent disco style.
 
 ## Getting Started
 #### Setup
