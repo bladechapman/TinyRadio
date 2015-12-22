@@ -9,7 +9,7 @@ TinyRadio is a distributed, synchronized Web Audio experiment designed to help y
 
 ## Getting Started
 #### Setup
-TinyRadio uses node, npm, and bower. To set up your radio, clone or download this repo and run the following commands:
+TinyRadio uses node, npm, and bower. To set up your radio, clone or download this repo and run the following commands in the directory containing ```radio.js```:
 ```
 $ npm install
 $ bower install
@@ -18,11 +18,11 @@ $ bower install
 #### Usage
 At the core of TinyRadio lies the server. It will broadcast over LAN by default, at which point everybody on the network can listen just by pointing their browsers to the given address.
 ```
-$ node app.js  
+$ node radio.js  
 $ Radio broadcasting at: 123.4.5.67:8000
 ```
 
-By default, TinyRadio will create a ```sound``` directory under the same location as ```app.js```, which you can then populate with the music files you'd like to broadcast. If you'd prefer to play music from a pre-existing directory, just use the ```-source``` flag to point TinyRadio to the location of your music.
+By default, TinyRadio will create a ```sound``` directory under the same location as ```radio.js```, which you can then populate with the music files you'd like to broadcast. If you'd prefer to play music from a pre-existing directory, just use the ```-source``` flag to point TinyRadio to the location of your music.
 ```
 $ node app.js -source ~/my/music/library
 $ Radio broadcasting at: 123.4.5.67:8000
@@ -30,7 +30,7 @@ $ Radio broadcasting at: 123.4.5.67:8000
 
 If you'd prefer not to broadcast over the network, you can use the ```-private``` flag to only play on localhost:
 ```
-$ node app.js -private
+$ node radio.js -private
 $ Radio broadcasting at: 127.0.0.1:8000
 ```
 
