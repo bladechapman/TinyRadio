@@ -24,7 +24,7 @@ $ Radio broadcasting at: 123.4.5.67:8000
 
 By default, TinyRadio will create a ```sound``` directory under the same location as ```radio.js```, which you can then populate with the music files you'd like to broadcast. If you'd prefer to play music from a pre-existing directory, just use the ```-source``` flag to point TinyRadio to the location of your music.
 ```
-$ node app.js -source ~/my/music/library
+$ node radio.js -source ~/my/music/library
 $ Radio broadcasting at: 123.4.5.67:8000
 ```
 
